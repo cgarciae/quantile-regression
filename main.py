@@ -55,6 +55,7 @@ etc.
 ## Quantile Loss
 The only thing special about quantile regression really is its loss function, instead of The
 usual L1 or L2 expression we que the following formula:
+
 $$
 \begin{aligned}
 
@@ -72,6 +73,7 @@ do we mean by this? Concretely it means that $L_q$ will bias $f(x)$ to output th
 of the $q$'th quantile instead of the usual mean or median statistic. How does it do it?
 
 First lets notice that this formula can be rewritten as follows:
+
 $$
 \begin{aligned}
 
@@ -204,8 +206,8 @@ def train_model(quantiles, epochs: int, lr: float, eager: bool):
         optimizer=optax.adamw(lr),
         run_eagerly=eager,
     )
-    # model.init(x, y)
-    # model.summary(x)
+    model.init(x, y)
+    model.summary(x)
 
     model.fit(x, y, epochs=epochs, batch_size=64, verbose=0)
 
