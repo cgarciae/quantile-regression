@@ -30,14 +30,20 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def create_data():
+def create_data(multimodal: bool):
     x = np.random.uniform(0.3, 10, 1000)
     y = np.log(x) + np.random.exponential(0.1 + x / 20.0)
+
+    if multimodal:
+        x = np.concatenate([x, np.random.uniform(5, 10, 500)])
+        y = np.concatenate([y, np.random.normal(6.0, 0.3, 500)])
 
     return x[..., None], y[..., None]
 
 
-x, y = create_data()
+multimodal: bool = False
+
+x, y = create_data(multimodal)
 
 fig = plt.figure()
 plt.scatter(x[..., 0], y[..., 0], s=20, facecolors="none", edgecolors="k")
@@ -151,6 +157,8 @@ class QuantileRegression(elegy.Module):
         self.n_quantiles = n_quantiles
 
     def call(self, x):
+        x = elegy.nn.Linear(128)(x)
+        x = jax.nn.gelu(x)
         x = elegy.nn.Linear(64)(x)
         x = jax.nn.gelu(x)
         x = elegy.nn.Linear(self.n_quantiles)(x)
@@ -196,8 +204,12 @@ def train_model(quantiles, epochs: int, lr: float, eager: bool):
     return model
 
 
-quantiles = (0.05, 0.25, 0.5, 0.75, 0.95)
-model = train_model(quantiles=quantiles, epochs=1001, lr=3e-4, eager=False)
+if not multimodal:
+    quantiles = (0.05, 0.1, 0.3, 0.5, 0.7, 0.9, 0.95)
+else:
+    quantiles = np.linspace(0.05, 0.95, 9)
+
+model = train_model(quantiles=quantiles, epochs=5001, lr=3e-4, eager=False)
 ```
 
 Now lets generate some test data that spans the entire domain and computre the predicted
@@ -212,8 +224,49 @@ plt.scatter(x, y, s=20, facecolors="none", edgecolors="k")
 for i, q_values in enumerate(np.split(y_pred, len(quantiles), axis=-1)):
     plt.plot(x_test, q_values[:, 0], linewidth=2, label=f"Q({quantiles[i]})")
 
-plt.legend()
+if not multimodal:
+    plt.legend()
 plt.show()
 ```
 Amazing! Notice how the first few quantiles are tightly packed together while the 
 last ones spread out capturing the behavior of the exponential distribution.
+
+```python
+def get_pdf(quantiles, q_values):
+    densities = []
+
+    for i in range(len(quantiles) - 1):
+        area = quantiles[i + 1] - quantiles[i]
+        b = q_values[i + 1] - q_values[i]
+        a = area / b
+
+        densities.append(a)
+
+    return densities
+
+
+def piecewise(xs):
+    return [xs[i + j] for i in range(len(xs) - 1) for j in range(2)]
+
+
+def doubled(xs):
+    return [np.clip(xs[i], 0, 3) for i in range(len(xs)) for _ in range(2)]
+```
+
+```python
+xi = 7.0
+
+q_values = model.predict(np.array([[xi]]))[0].tolist()
+
+densities = get_pdf(quantiles, q_values)
+
+
+plt.title(f"x = {xi}")
+plt.fill_between(piecewise(q_values), 0, doubled(densities))
+# plt.fill_between(q_values, 0, densities + [0])
+# plt.plot(q_values, densities + [0], color="k")
+plt.xlim(0, 8)
+plt.gca().set_xlabel("y")
+plt.gca().set_ylabel("p(y)")
+plt.show()
+```
