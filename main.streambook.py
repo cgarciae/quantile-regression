@@ -147,9 +147,9 @@ with __st.echo(), streambook.st_stdout('info'):
 
         def call(self, x):
             x = elegy.nn.Linear(128)(x)
-            x = jax.nn.gelu(x)
+            x = jax.nn.relu(x)
             x = elegy.nn.Linear(64)(x)
-            x = jax.nn.gelu(x)
+            x = jax.nn.relu(x)
             x = elegy.nn.Linear(self.n_quantiles)(x)
 
             return x
@@ -185,7 +185,7 @@ with __st.echo(), streambook.st_stdout('info'):
         # model.init(x, y)
         # model.summary(x)
 
-        model.fit(x, y, epochs=epochs, batch_size=32, verbose=0)
+        model.fit(x, y, epochs=epochs, batch_size=64, verbose=0)
 
         return model
 
@@ -195,7 +195,7 @@ with __st.echo(), streambook.st_stdout('info'):
     else:
         quantiles = np.linspace(0.05, 0.95, 9)
 
-    model = train_model(quantiles=quantiles, epochs=5001, lr=3e-4, eager=False)
+    model = train_model(quantiles=quantiles, epochs=3001, lr=1e-4, eager=False)
 __st.markdown(r"""Now lets generate some test data that spans the entire domain and computre the predicted
 quantiles.""")
 with __st.echo(), streambook.st_stdout('info'):
@@ -206,10 +206,9 @@ with __st.echo(), streambook.st_stdout('info'):
     plt.scatter(x, y, s=20, facecolors="none", edgecolors="k")
 
     for i, q_values in enumerate(np.split(y_pred, len(quantiles), axis=-1)):
-        plt.plot(x_test, q_values[:, 0], linewidth=2, label=f"Q({quantiles[i]})")
+        plt.plot(x_test, q_values[:, 0], linewidth=2, label=f"Q({quantiles[i]:.2f})")
 
-    if not multimodal:
-        plt.legend()
+    plt.legend()
     plt.show()
     fig  # __st
 __st.markdown(r"""Amazing! Notice how the first few quantiles are tightly packed together while the 
@@ -248,7 +247,7 @@ with __st.echo(), streambook.st_stdout('info'):
     plt.fill_between(piecewise(q_values), 0, doubled(densities))
     # plt.fill_between(q_values, 0, densities + [0])
     # plt.plot(q_values, densities + [0], color="k")
-    plt.xlim(0, 8)
+    plt.xlim(0, y.max())
     plt.gca().set_xlabel("y")
     plt.gca().set_ylabel("p(y)")
     plt.show()
