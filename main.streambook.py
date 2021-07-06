@@ -5,9 +5,9 @@ __toc = streambook.TOCSidebar()
 __st.markdown(r"""# Quantile Regression
 
 Most common Machine Learning techniques are focused on generating predictions 
-about an output but usually give no information about the confidence of such outcome,
-this seems to be specially true in Deep Learning where rarely you get statistical 
-properties for your model. There are however ways around this, once such way which we
+about an outcome but usually give no information about the confidence of such outcome,
+this seems to be specially true in Deep Learning where you rarely have the statistical 
+properties of a model. There are however ways around this, once such way which we
 will be exploring here is called **Quantile Regression**, this technique will allow us to learn
 some very important statistical properties of our data: the quantiles.
 
