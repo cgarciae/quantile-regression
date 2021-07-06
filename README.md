@@ -1,18 +1,3 @@
----
-jupyter:
-  jupytext:
-    cell_metadata_filter: tags,-all
-    text_representation:
-      extension: .md
-      format_name: markdown
-      format_version: '1.3'
-      jupytext_version: 1.11.3
-  kernelspec:
-    display_name: 'Python 3.8.1 64-bit (''.venv'': poetry)'
-    language: python
-    name: python381jvsc74a57bd0e83beb2096c46aacf9a9e0fbc7f3031b5c13c8f9b1f2e4cffcbeb7cd88d847d0
----
-
 # Quantile Regression
 
 Most common Machine Learning techniques are focused on generating predictions 
@@ -49,6 +34,13 @@ fig = plt.figure()
 plt.scatter(x[..., 0], y[..., 0], s=20, facecolors="none", edgecolors="k")
 plt.show()
 ```
+
+
+    
+![png](README_files/README_1_0.png)
+    
+
+
 We have a simple 2D dataset however we should notice that `y` has some very peculiar statistical properties:
 
 1. It is not normally distributed, infact it is exponentially distributed.
@@ -92,6 +84,8 @@ $$
 
 Using $\max$ instead of a conditional statement will make it easier implement on tensor/array
 libraries, we will do this next in jax.
+
+
 ```python
 import jax
 import jax.numpy as jnp
@@ -107,6 +101,8 @@ Now that we have this lets explore the error landscape for a particular set of p
 Here we will generate values in the interval $[10, 20]$ and for a particular value of 
 $q$ (0.8 by default) we will compute the total error for all values that $f(x)$ could take 
 within this range.
+
+
 ```python
 
 
@@ -132,6 +128,16 @@ plt.gca().set_ylabel("loss")
 plt.title(f"Q({q:.2f}) = {q_true:.1f}")
 plt.show()
 ```
+
+    WARNING:absl:No GPU/TPU found, falling back to CPU. (Set TF_CPP_MIN_LOG_LEVEL=0 and rerun for more info.)
+
+
+
+    
+![png](README_files/README_5_1.png)
+    
+
+
 What we see is that the minumum of this function is exactly $q$. It achieves this because
 the quantile loss is not symetrical, for quantiles above `0.5` it penalizes positive 
 errors stronger than negative errors, and the opposite is true for quantiles below `0.5`.
@@ -144,6 +150,8 @@ we can have it output the predictions for all the quantiles at the same time whi
 sharing the same backbone. Here will use `elegy` to create a neural network
 with 1 hidden layers with a `gelu` activation and then a linear layers with `n_quantiles` output
 units. 
+
+
 ```python
 import elegy
 
@@ -165,6 +173,8 @@ class QuantileRegression(elegy.Module):
 
 Now we are going to properly define a `QuantileLoss` class that is parameterized by
 a set of user defined `quantiles`.
+
+
 ```python
 
 
@@ -182,6 +192,8 @@ class QuantileLoss(elegy.Loss):
 
 Finally we are going to create a simple function that creates and trains our model for a
 set of quantiles using `elegy`.
+
+
 ```python
 import optax
 
@@ -209,9 +221,38 @@ else:
 model = train_model(quantiles=quantiles, epochs=3001, lr=1e-4, eager=False)
 ```
 
+
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┓
+┃<span style="font-weight: bold"> Layer                        </span>┃<span style="font-weight: bold"> Outputs Shape        </span>┃<span style="font-weight: bold"> Trainable        </span>┃<span style="font-weight: bold"> Non-trainable </span>┃
+┃                              ┃                      ┃<span style="font-weight: bold"> Parameters       </span>┃<span style="font-weight: bold"> Parameters    </span>┃
+┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━┩
+│ Inputs                       │ (1000, 1)    <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">float64</span> │                  │               │
+├──────────────────────────────┼──────────────────────┼──────────────────┼───────────────┤
+│ linear    <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">Linear</span>             │ (1000, 128)  <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">float32</span> │ <span style="color: #008000; text-decoration-color: #008000">256</span>      <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">1.0 KB</span>  │               │
+├──────────────────────────────┼──────────────────────┼──────────────────┼───────────────┤
+│ linear_1  <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">Linear</span>             │ (1000, 64)   <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">float32</span> │ <span style="color: #008000; text-decoration-color: #008000">8,256</span>    <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">33.0 KB</span> │               │
+├──────────────────────────────┼──────────────────────┼──────────────────┼───────────────┤
+│ linear_2  <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">Linear</span>             │ (1000, 7)    <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">float32</span> │ <span style="color: #008000; text-decoration-color: #008000">455</span>      <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">1.8 KB</span>  │               │
+├──────────────────────────────┼──────────────────────┼──────────────────┼───────────────┤
+│ *         <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">QuantileRegression</span> │ (1000, 7)    <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">float32</span> │                  │               │
+├──────────────────────────────┼──────────────────────┼──────────────────┼───────────────┤
+│<span style="font-weight: bold">                              </span>│<span style="font-weight: bold">                Total </span>│<span style="font-weight: bold"> </span><span style="color: #008000; text-decoration-color: #008000; font-weight: bold">8,967</span><span style="font-weight: bold">    </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f; font-weight: bold">35.9 KB</span><span style="font-weight: bold"> </span>│<span style="font-weight: bold">               </span>│
+└──────────────────────────────┴──────────────────────┴──────────────────┴───────────────┘
+<span style="font-weight: bold">                                                                                          </span>
+<span style="font-weight: bold">                            Total Parameters: </span><span style="color: #008000; text-decoration-color: #008000; font-weight: bold">8,967</span><span style="font-weight: bold">   </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f; font-weight: bold">35.9 KB</span><span style="font-weight: bold">                             </span>
+</pre>
+
+
+
+    
+    
+
+
 Now lets generate some test data that spans the entire domain and computre the predicted
 quantiles.
-```python tags=["hide_input"]
+
+
+```python
 x_test = np.linspace(x.min(), x.max(), 100)
 y_pred = model.predict(x_test[..., None])
 
@@ -224,8 +265,16 @@ for i, q_values in enumerate(np.split(y_pred, len(quantiles), axis=-1)):
 plt.legend()
 plt.show()
 ```
+
+
+    
+![png](README_files/README_13_0.png)
+    
+
+
 Amazing! Notice how the first few quantiles are tightly packed together while the 
 last ones spread out capturing the behavior of the exponential distribution.
+
 
 ```python
 def get_pdf(quantiles, q_values):
@@ -249,6 +298,7 @@ def doubled(xs):
     return [np.clip(xs[i], 0, 3) for i in range(len(xs)) for _ in range(2)]
 ```
 
+
 ```python
 xi = 7.0
 
@@ -266,3 +316,9 @@ plt.gca().set_xlabel("y")
 plt.gca().set_ylabel("p(y)")
 plt.show()
 ```
+
+
+    
+![png](README_files/README_16_0.png)
+    
+
