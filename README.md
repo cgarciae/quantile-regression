@@ -70,7 +70,7 @@ Here $E$ is the error term and $L_q$ is the loss function for the quantile $q$. 
 do we mean by this? Concretely it means that $L_q$ will bias $f(x)$ to output the value
 of the $q$'th quantile instead of the usual mean or median statistic. How does it do it?
 
-First lets notice that this formula can be rewritten as follows:
+First lets notice that this formula can be rewritten as follows: 111
 
 $$
 \begin{aligned}
