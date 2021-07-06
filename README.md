@@ -148,7 +148,7 @@ In particular, quantile `0.5` is the median and its formula is equivalent to the
 Generally you would have to a model per quantile, however if we use a neural network
 we can have it output the predictions for all the quantiles at the same time while
 sharing the same backbone. Here will use `elegy` to create a neural network
-with 1 hidden layers with a `gelu` activation and then a linear layers with `n_quantiles` output
+with 2 hidden layers with `relu` activation and then a linear layers with `n_quantiles` output
 units. 
 
 
