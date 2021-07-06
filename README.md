@@ -61,35 +61,32 @@ outcome is expected or not, what are the best and worst case scenarios for a par
 etc.
 
 ## Quantile Loss
-The only thing special about quantile regression really is its loss function, instead of The
-usual L1 or L2 expression we que the following formula:
+The only thing special about quantile regression really is its loss function, instead of the
+usual L1 or L2 expression we use the following formula:
+
 $$
 \begin{aligned}
-
     E &= y - f(x) \\
-
     L_q &= \begin{cases}
         q  E,     &    E \gt 0  \\
         (1 - q) (-E), &    E \lt 0
     \end{cases}
-
 \end{aligned}
 $$
+
 Here $E$ is the error term and $L_q$ is the loss function for the quantile $q$. So what
 do we mean by this? Concretely it means that $L_q$ will bias $f(x)$ to output the value
 of the $q$'th quantile instead of the usual mean or median statistic. How does it do it?
 
 First lets notice that this formula can be rewritten as follows:
+
 $$
 \begin{aligned}
-
     E &= y - f(x) \\
-
     L_q &= \max \begin{cases}
         q  E   \\
         (q - 1) E
     \end{cases}
-
 \end{aligned}
 $$
 
@@ -196,8 +193,8 @@ def train_model(quantiles, epochs: int, lr: float, eager: bool):
         optimizer=optax.adamw(lr),
         run_eagerly=eager,
     )
-    # model.init(x, y)
-    # model.summary(x)
+    model.init(x, y)
+    model.summary(x)
 
     model.fit(x, y, epochs=epochs, batch_size=64, verbose=0)
 
