@@ -35,7 +35,7 @@ multimodal = __st.checkbox("Use multimodal data", False)
 
 x, y = create_data(multimodal)
 
-fig = plt.figure()
+fig = plt.figure()  # __st
 plt.scatter(x[..., 0], y[..., 0], s=20, facecolors="none", edgecolors="k")
 plt.show()
 fig  # __st
@@ -70,7 +70,7 @@ Here $E$ is the error term and $L_q$ is the loss function for the quantile $q$. 
 do we mean by this? Concretely it means that $L_q$ will bias $f(x)$ to output the value
 of the $q$'th quantile instead of the usual mean or median statistic. How does it do it?
 
-First lets notice that this formula can be rewritten as follows: 111
+First lets notice that this formula can be rewritten as follows:
 
 $$
 \begin{aligned}
@@ -122,7 +122,7 @@ q = __st.slider("q", 0.001, 0.999, q)
 y_true, y_pred, loss = calculate_error(q)
 q_true = np.quantile(y_true, q)
 
-fig = plt.figure()
+fig = plt.figure()  # __st
 plt.plot(y_pred, loss)
 plt.vlines(q_true, 0, loss.max(), linestyles="dashed", colors="k")
 plt.gca().set_xlabel("y_pred")
@@ -225,7 +225,7 @@ quantiles.
 x_test = np.linspace(x.min(), x.max(), 100)
 y_pred = model.predict(x_test[..., None])
 
-fig = plt.figure()
+fig = plt.figure()  # __st
 plt.scatter(x, y, s=20, facecolors="none", edgecolors="k")
 
 for i, q_values in enumerate(np.split(y_pred, len(quantiles), axis=-1)):
