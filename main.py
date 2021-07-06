@@ -58,16 +58,14 @@ usual L1 or L2 expression we que the following formula:
 
 $$
 \begin{aligned}
-
     E &= y - f(x) \\
-
     L_q &= \begin{cases}
         q  E,     &    E \gt 0  \\
         (1 - q) (-E), &    E \lt 0
     \end{cases}
-
 \end{aligned}
 $$
+
 Here $E$ is the error term and $L_q$ is the loss function for the quantile $q$. So what
 do we mean by this? Concretely it means that $L_q$ will bias $f(x)$ to output the value
 of the $q$'th quantile instead of the usual mean or median statistic. How does it do it?
@@ -76,14 +74,11 @@ First lets notice that this formula can be rewritten as follows:
 
 $$
 \begin{aligned}
-
     E &= y - f(x) \\
-
     L_q &= \max \begin{cases}
         q  E   \\
         (q - 1) E
     \end{cases}
-
 \end{aligned}
 $$
 
