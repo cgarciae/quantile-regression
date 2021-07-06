@@ -53,8 +53,8 @@ outcome is expected or not, what are the best and worst case scenarios for a par
 etc.
 
 ## Quantile Loss
-The only thing special about quantile regression really is its loss function, instead of The
-usual L1 or L2 expression we que the following formula:
+The only thing special about quantile regression really is its loss function, instead of the
+usual L1 or L2 expression we use the following formula:
 
 $$
 \begin{aligned}
