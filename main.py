@@ -2,12 +2,16 @@
 """
 # Quantile Regression
 
-Most common Machine Learning techniques are focused on generating predictions 
-about an outcome but usually give no information about the confidence of such outcome,
-this seems to be specially true in Deep Learning where you rarely have the statistical 
-properties of a model. There are however ways around this, once such way which we
-will be exploring here is called **Quantile Regression**, this technique will allow us to learn
-some very important statistical properties of our data: the quantiles.
+When trying to predict and output it is some times useful to also get a confidence score
+or similarly a range of values around this expected value in which the true value might be found. 
+Practical examples of this include estimating upper and lower bound when predicting a 
+time of arrival (ETA) or a stock price since you not only care about an expected value 
+but also about the best case and worst case scenarios when trying to minimize risk.
+
+While most Machine Learning techniques don't provide a natural way of doing this, 
+in this article we will be exploring **Quantile Regression** as a means of doing so, 
+this technique will allow us to learn some very important statistical properties 
+of our data: the quantiles.
 
 To begin our journey into quantile regression we will first get hold on some data:
 """
@@ -16,6 +20,8 @@ To begin our journey into quantile regression we will first get hold on some dat
 # %%
 import numpy as np
 import matplotlib.pyplot as plt
+
+plt.rcParams["figure.dpi"] = 300
 
 
 @__st.cache
@@ -41,20 +47,16 @@ plt.show()
 fig  # __st
 # %% [markdown]
 """
-We have a simple 2D dataset however we should notice that `y` has some very peculiar statistical properties:
+Here we have a simple 2D dataset, however notice that `y` has some very peculiar statistical properties:
 
 1. It is not normally distributed, infact it is exponentially distributed.
 2. The previous also means its noise it not symetric. 
 3. Its variance is not constant, it increases as `x` increases.
 
-When making prediction for this kind of data we might be very interested to know what are
-the lower and upper bounds our data revolves around such that we can judge if a specific
-outcome is expected or not, what are the best and worst case scenarios for a particular variable,
-etc.
+When making prediction for this kind of data we might be very interested to know what range of values our data revolves around such that we can judge  if a specific outcome is expected or not, what are the best and worst case scenarios, etc.
 
 ## Quantile Loss
-The only thing special about quantile regression really is its loss function, instead of the
-usual L1 or L2 expression we use the following formula:
+The only thing special about quantile regression really is its loss function, instead of the usual MAE or MSE losses for quantile regression we use the following function:
 
 $$
 \begin{aligned}
@@ -66,9 +68,7 @@ $$
 \end{aligned}
 $$
 
-Here $E$ is the error term and $L_q$ is the loss function for the quantile $q$. So what
-do we mean by this? Concretely it means that $L_q$ will bias $f(x)$ to output the value
-of the $q$'th quantile instead of the usual mean or median statistic. How does it do it?
+Here $E$ is the error term and $L_q$ is the loss function for the quantile $q$. So what do we mean by this? Concretely it means that $L_q$ will bias $f(x)$ to output the value of the $q$'th quantile instead of the usual mean or median statistic. The big question is: how does it do it?
 
 First lets notice that this formula can be rewritten as follows:
 
@@ -82,8 +82,7 @@ $$
 \end{aligned}
 $$
 
-Using $\max$ instead of a conditional statement will make it easier implement on tensor/array
-libraries, we will do this next in jax.
+Using $\max$ instead of a conditional statement will make it easier implement on tensor/array libraries, we will do this next in jax.
 """
 # %%
 import jax
@@ -98,10 +97,7 @@ def quantile_loss(q, y_true, y_pred):
 # %% [markdown]
 """
 ## Loss Landscape
-Now that we have this lets explore the error landscape for a particular set of predictions.
-Here we will generate values in the interval $[10, 20]$ and for a particular value of 
-$q$ (0.8 by default) we will compute the total error for all values that $f(x)$ could take 
-within this range.
+Now that we have this function lets explore the error landscape for a particular set of predictions. Here we will generate values for `y_true` in the range $[10, 20]$ and for a particular value of $q$ (0.8 by default) we will compute the total error you would get for each value `y_pred` could take. Ideally we want to find the the value of `y_pred` where the error is the smallest.
 """
 # %%
 
@@ -132,18 +128,11 @@ plt.show()
 fig  # __st
 # %% [markdown]
 """
-What we see is that the minumum of this function is exactly $q$. It achieves this because
-the quantile loss is not symetrical, for quantiles above `0.5` it penalizes positive 
-errors stronger than negative errors, and the opposite is true for quantiles below `0.5`.
-In particular, quantile `0.5` is the median and its formula is equivalent to the L1 loss.
+If we plot the error what we see is that the minumum of value of the quantile loss is exactly at the value of the $q$th quantile. It achieves this because the quantile loss is not symetrical, for quantiles above `0.5` it penalizes positive  errors stronger than negative errors, and the opposite is true for quantiles below `0.5`. In particular, quantile `0.5` is the median and its formula is equivalent to the MAE.
 
 ## Deep Quantile Regression
 
-Generally you would have to a model per quantile, however if we use a neural network
-we can have it output the predictions for all the quantiles at the same time while
-sharing the same backbone. Here will use `elegy` to create a neural network
-with 2 hidden layers with `relu` activation and then a linear layers with `n_quantiles` output
-units. 
+Generally you would have to create a model per quantile, however if we use a neural network we can have it output the predictions for all the quantiles at the same time. Here will use `elegy` to create a neural network with 2 hidden layers with `relu` activations and a linear layers with `n_quantiles` output units.
 """
 # %%
 import elegy
@@ -186,8 +175,7 @@ class QuantileLoss(elegy.Loss):
 
 # %% [markdown]
 """
-Finally we are going to create a simple function that creates and trains our model for a
-set of quantiles using `elegy`.
+Notice that we use the same `quantile_loss` that we created previously along with some `jax.vmap` magic to properly vectorize the function. Finally we are going to create a simple function that creates and trains our model for a set of quantiles using `elegy`.
 """
 # %%
 import optax
@@ -218,8 +206,7 @@ model = train_model(quantiles=quantiles, epochs=3001, lr=1e-4, eager=False)
 
 # %% [markdown]
 """
-Now lets generate some test data that spans the entire domain and computre the predicted
-quantiles.
+Now that we have a model lets generate some test data that spans the entire domain and compute the predicted quantiles.
 """
 # %% tags=["hide_input"]
 x_test = np.linspace(x.min(), x.max(), 100)
@@ -236,8 +223,9 @@ plt.show()
 fig  # __st
 # %% [markdown]
 """
-Amazing! Notice how the first few quantiles are tightly packed together while the 
-last ones spread out capturing the behavior of the exponential distribution.
+Amazing! Notice how the first few quantiles are tightly packed together while the last ones spread out capturing the behavior of the exponential distribution. 
+
+Having the quantile values also allows you to estimate the density of the data, since the difference between two adjacent quantiles represent the probability that a point lies between them, we can construct a piecewise function that approximates the density of the data.
 """
 
 # %%
@@ -262,6 +250,10 @@ def doubled(xs):
     return [np.clip(xs[i], 0, 3) for i in range(len(xs)) for _ in range(2)]
 
 
+# %% [markdown]
+"""
+Now for a given `x` we can compute the quantile values and then use these to compute the conditional piecewise density function of `y` given `x`.
+"""
 # %%
 xi = 7.0
 xi = __st.slider("xi", 0.0001, 11.0, xi)
@@ -269,7 +261,6 @@ xi = __st.slider("xi", 0.0001, 11.0, xi)
 q_values = model.predict(np.array([[xi]]))[0].tolist()
 
 densities = get_pdf(quantiles, q_values)
-
 
 fig = plt.figure()  # __st
 plt.title(f"x = {xi}")
@@ -281,3 +272,21 @@ plt.gca().set_xlabel("y")
 plt.gca().set_ylabel("p(y)")
 plt.show()
 fig  # __st
+
+# %% [markdown]
+"""
+One of the nice properties of Quantile Regression is that we did not need to know a priori the output distribution and training is easy in comparison to other methods.
+
+## Recap
+* Quantile Regression is a simple and effective method for learning some statistics
+about the output distribution.
+* It is specially useful to stablish bounds on the predictions of a model when risk management is desired.
+* The Quantile Loss function is simple and easy to implement.
+* Quantile Regression can be efficiently implemented in using Neural Networks since a single model can be used to predict all the quantiles.
+* The quantiles can be used to estimate the conditional density of the data.
+
+## Next Steps
+* Try running this notebook with `multimodal = True`.
+* Take a look at Mixture Density Networks.
+* Learn more about [jax](https://github.com/google/jax) and [elegy](https://github.com/poets-ai/elegy).
+"""
