@@ -14,7 +14,7 @@ Estimating uncertainty in Machine Learning
 ---
 
 ## Problem
-![png](https://raw.githubusercontent.com/cgarciae/quantile-regression/master/main_files/README_1_0.png)
+![png](https://raw.githubusercontent.com/cgarciae/quantile-regression/master/main_files/main_1_0.png)
     
 
 ---
@@ -64,7 +64,7 @@ def quantile_loss(q, y_true, y_pred):
 ---
 
 ## Loss Landscape
-![png](https://raw.githubusercontent.com/cgarciae/quantile-regression/master/main_files/README_5_1.png)
+![png](https://raw.githubusercontent.com/cgarciae/quantile-regression/master/main_files/main_5_1.png)
     
 For a sequence of values of `y_true` between `[10, 20]`.
 
@@ -186,7 +186,7 @@ plt.show()
 
 
     
-![png](https://raw.githubusercontent.com/cgarciae/quantile-regression/master/main_files/README_13_0.png)
+![png](https://raw.githubusercontent.com/cgarciae/quantile-regression/master/main_files/main_13_0.png)
     
 
 
@@ -239,7 +239,7 @@ plt.show()
 
 
     
-![png](https://raw.githubusercontent.com/cgarciae/quantile-regression/master/main_files/README_17_0.png)
+![png](https://raw.githubusercontent.com/cgarciae/quantile-regression/master/main_files/main_17_0.png)
     
 
 
