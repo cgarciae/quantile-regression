@@ -19,6 +19,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 plt.rcParams["figure.dpi"] = 300
+plt.rcParams["figure.facecolor"] = "white"
 
 
 def create_data(multimodal: bool):
@@ -42,7 +43,7 @@ plt.show()
 
 
     
-![png](README_files/README_1_0.png)
+![png](main_files/main_1_0.png)
     
 
 
@@ -128,7 +129,7 @@ plt.show()
 
 
     
-![png](README_files/README_5_1.png)
+![png](main_files/main_5_1.png)
     
 
 
@@ -252,7 +253,7 @@ plt.show()
 
 
     
-![png](README_files/README_13_0.png)
+![png](main_files/main_13_0.png)
     
 
 
@@ -305,7 +306,7 @@ plt.show()
 
 
     
-![png](README_files/README_17_0.png)
+![png](main_files/main_17_0.png)
     
 
 

@@ -22,6 +22,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 plt.rcParams["figure.dpi"] = 300
+plt.rcParams["figure.facecolor"] = "white"
 
 
 @__st.cache

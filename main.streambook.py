@@ -21,6 +21,7 @@ with __st.echo(), streambook.st_stdout('info'):
     import matplotlib.pyplot as plt
 
     plt.rcParams["figure.dpi"] = 300
+    plt.rcParams["figure.facecolor"] = "white"
 
 
     @__st.cache
