@@ -14,7 +14,8 @@ Estimating uncertainty in Machine Learning
 ---
 
 ## Problem
-![png](https://raw.githubusercontent.com/cgarciae/quantile-regression/master/main_files/main_1_0.png)
+
+<img src="https://raw.githubusercontent.com/cgarciae/quantile-regression/master/main_files/main_1_0.png" height="80%" width="auto" />
     
 
 ---
@@ -64,7 +65,7 @@ def quantile_loss(q, y_true, y_pred):
 ---
 
 ## Loss Landscape
-![png](https://raw.githubusercontent.com/cgarciae/quantile-regression/master/main_files/main_5_1.png)
+<img src="https://raw.githubusercontent.com/cgarciae/quantile-regression/master/main_files/main_5_1.png" height="80%" width="auto">
     
 For a sequence of values of `y_true` between `[10, 20]`.
 
@@ -186,7 +187,7 @@ plt.show()
 
 
     
-![png](https://raw.githubusercontent.com/cgarciae/quantile-regression/master/main_files/main_13_0.png)
+<img src="https://raw.githubusercontent.com/cgarciae/quantile-regression/master/main_files/main_13_0.png" height="80%" width="auto">
     
 
 
@@ -239,7 +240,7 @@ plt.show()
 
 
     
-![png](https://raw.githubusercontent.com/cgarciae/quantile-regression/master/main_files/main_17_0.png)
+<img src="https://raw.githubusercontent.com/cgarciae/quantile-regression/master/main_files/main_17_0.png" height="80%" width="auto">
     
 
 
@@ -256,4 +257,4 @@ about the output distribution.
 ## Next Steps
 * Try running this notebook with `multimodal = True`.
 * Take a look at Mixture Density Networks.
-* Learn more about [jax](https://github.com/google/jax) and [elegy](https://github.com/poets-ai/elegy).
+* Learn more about [jax]("https://github.com/google/jax) and [elegy]("https://github.com/poets-ai/elegy).
