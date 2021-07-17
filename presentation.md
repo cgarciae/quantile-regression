@@ -1,11 +1,16 @@
 # Quantile Regression
+Estimating uncertainty in Machine Learning
 
 ---
 
-## How to measure uncertainty?
-![uncertainty](images/uncertainty.png)
-* Get bounds for the data (predicting ETAs, stock prices, etc).
-* Estimate density of the data.
+## Why estimate uncertainty?
+
+* Get bounds for the data.
+* Estimate the distribution of the output.
+<span>
+* **Reduce Risk**.<!-- .element: class="fragment" data-fragment-index="1" -->
+</span>
+
 
 ---
 
