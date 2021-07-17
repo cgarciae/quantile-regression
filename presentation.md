@@ -2,9 +2,10 @@
 
 ---
 
-## How to measure uncertainty in ML?
-* How to estimate upper and lower bound when predicting ETA? 
-* How to estimate best case and worst case scenarios predicting a stock price?
+## How to measure uncertainty?
+![uncertainty](images/uncertainty.png)
+* Get bounds for the data (predicting ETAs, stock prices, etc).
+* Estimate density of the data.
 
 ---
 
