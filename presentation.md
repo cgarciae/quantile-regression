@@ -11,58 +11,22 @@ Estimating uncertainty in Machine Learning
 * **Reduce Risk**.<!-- .element: class="fragment" data-fragment-index="1" -->
 </span>
 
+---
+
+## Problem
+![png](https://raw.githubusercontent.com/cgarciae/quantile-regression/master/README_files/README_1_0.png)
+    
 
 ---
 
-## Quantile Regression
-Allow us to learn some very important statistical properties 
-of our data: **the quantiles**.
+## Properties
+1. It is not normally distributed.
+2. Noise it not symetric. 
+3. Its variance is not constant.
 
-To begin our journey into quantile regression we will first get hold on some data:
-
-
-```python
-import numpy as np
-import matplotlib.pyplot as plt
-
-plt.rcParams["figure.dpi"] = 300
-
-
-def create_data(multimodal: bool):
-    x = np.random.uniform(0.3, 10, 1000)
-    y = np.log(x) + np.random.exponential(0.1 + x / 20.0)
-
-    if multimodal:
-        x = np.concatenate([x, np.random.uniform(5, 10, 500)])
-        y = np.concatenate([y, np.random.normal(6.0, 0.3, 500)])
-
-    return x[..., None], y[..., None]
-
-
-multimodal: bool = False
-
-x, y = create_data(multimodal)
-
-plt.scatter(x[..., 0], y[..., 0], s=20, facecolors="none", edgecolors="k")
-plt.show()
-```
-
-
-    
-![png](README_files/README_1_0.png)
-    
-
-
-Here we have a simple 2D dataset, however notice that `y` has some very peculiar statistical properties:
-
-1. It is not normally distributed, infact it is exponentially distributed.
-2. The previous also means its noise it not symetric. 
-3. Its variance is not constant, it increases as `x` increases.
-
-When making prediction for this kind of data we might be very interested to know what range of values our data revolves around such that we can judge  if a specific outcome is expected or not, what are the best and worst case scenarios, etc.
+---
 
 ## Quantile Loss
-The only thing special about quantile regression really is its loss function, instead of the usual MAE or MSE losses for quantile regression we use the following function:
 
 $$
 \begin{aligned}
@@ -74,9 +38,9 @@ $$
 \end{aligned}
 $$
 
-Here $E$ is the error term and $L_q$ is the loss function for the quantile $q$. So what do we mean by this? Concretely it means that $L_q$ will bias $f(x)$ to output the value of the $q$'th quantile instead of the usual mean or median statistic. The big question is: how does it do it?
+---
 
-First lets notice that this formula can be rewritten as follows:
+## Quantile Loss
 
 $$
 \begin{aligned}
@@ -88,58 +52,19 @@ $$
 \end{aligned}
 $$
 
-Using $\max$ instead of a conditional statement will make it easier implement on tensor/array libraries, we will do this next in jax.
+---
 
-
+## JAX Implementation
 ```python
-import jax
-import jax.numpy as jnp
-
-
 def quantile_loss(q, y_true, y_pred):
     e = y_true - y_pred
     return jnp.maximum(q * e, (q - 1.0) * e)
 ```
 
 ## Loss Landscape
-Now that we have this function lets explore the error landscape for a particular set of predictions. Here we will generate values for `y_true` in the range $[10, 20]$ and for a particular value of $q$ (0.8 by default) we will compute the total error you would get for each value `y_pred` could take. Ideally we want to find the the value of `y_pred` where the error is the smallest.
-
-
-```python
-
-
-def calculate_error(q):
-    y_true = np.linspace(10, 20, 100)
-    y_pred = np.linspace(10, 20, 200)
-
-    loss = jax.vmap(quantile_loss, in_axes=(None, None, 0))(q, y_true, y_pred)
-    loss = loss.mean(axis=1)
-
-    return y_true, y_pred, loss
-
-
-q = 0.8
-y_true, y_pred, loss = calculate_error(q)
-q_true = np.quantile(y_true, q)
-
-plt.plot(y_pred, loss)
-plt.vlines(q_true, 0, loss.max(), linestyles="dashed", colors="k")
-plt.gca().set_xlabel("y_pred")
-plt.gca().set_ylabel("loss")
-plt.title(f"Q({q:.2f}) = {q_true:.1f}")
-plt.show()
-```
-
-    WARNING:absl:No GPU/TPU found, falling back to CPU. (Set TF_CPP_MIN_LOG_LEVEL=0 and rerun for more info.)
-
-
-
+![png](https://raw.githubusercontent.com/cgarciae/quantile-regression/master/README_files/README_5_1.png)
     
-![png](README_files/README_5_1.png)
-    
-
-
-If we plot the error what we see is that the minumum of value of the quantile loss is exactly at the value of the $q$th quantile. It achieves this because the quantile loss is not symetrical, for quantiles above `0.5` it penalizes positive  errors stronger than negative errors, and the opposite is true for quantiles below `0.5`. In particular, quantile `0.5` is the median and its formula is equivalent to the MAE.
+For a sequence of values of `y_true` between `[10, 20]`.
 
 ## Deep Quantile Regression
 
@@ -259,7 +184,7 @@ plt.show()
 
 
     
-![png](README_files/README_13_0.png)
+![png](https://raw.githubusercontent.com/cgarciae/quantile-regression/master/README_files/README_13_0.png)
     
 
 
@@ -312,7 +237,7 @@ plt.show()
 
 
     
-![png](README_files/README_17_0.png)
+![png](https://raw.githubusercontent.com/cgarciae/quantile-regression/master/README_files/README_17_0.png)
     
 
 
