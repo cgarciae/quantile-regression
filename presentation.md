@@ -61,6 +61,8 @@ def quantile_loss(q, y_true, y_pred):
     return jnp.maximum(q * e, (q - 1.0) * e)
 ```
 
+---
+
 ## Loss Landscape
 ![png](https://raw.githubusercontent.com/cgarciae/quantile-regression/master/README_files/README_5_1.png)
     
