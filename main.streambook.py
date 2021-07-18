@@ -3,7 +3,9 @@ import streamlit as __st
 import streambook
 __toc = streambook.TOCSidebar()
 __st.markdown(r"""# Quantile Regression
+A simple method to estimate uncertainty in Machine Learning
 
+## Motivation
 When trying to predict and output it is some times useful to also get a confidence score
 or similarly a range of values around this expected value in which the true value might be found. 
 Practical examples of this include estimating upper and lower bound when predicting a 
@@ -22,6 +24,7 @@ with __st.echo(), streambook.st_stdout('info'):
 
     plt.rcParams["figure.dpi"] = 300
     plt.rcParams["figure.facecolor"] = "white"
+    np.random.seed(69)
 
 
     @__st.cache
@@ -92,8 +95,6 @@ with __st.echo(), streambook.st_stdout('info'):
 __st.markdown(r"""## Loss Landscape
 Now that we have this function lets explore the error landscape for a particular set of predictions. Here we will generate values for `y_true` in the range $[10, 20]$ and for a particular value of $q$ (0.8 by default) we will compute the total error you would get for each value `y_pred` could take. Ideally we want to find the the value of `y_pred` where the error is the smallest.""")
 with __st.echo(), streambook.st_stdout('info'):
-
-
     @__st.cache
     def calculate_error(q):
         y_true = np.linspace(10, 20, 100)
@@ -143,8 +144,6 @@ with __st.echo(), streambook.st_stdout('info'):
 __st.markdown(r"""Now we are going to properly define a `QuantileLoss` class that is parameterized by
 a set of user defined `quantiles`.""")
 with __st.echo(), streambook.st_stdout('info'):
-
-
     class QuantileLoss(elegy.Loss):
         def __init__(self, quantiles):
             super().__init__()
@@ -208,16 +207,12 @@ with __st.echo(), streambook.st_stdout('info'):
         y_pred[:, median_idx],
         color="r",
         linestyle="dashed",
-        label="median",
+        label="Q(0.5)",
     )
     plt.legend()
     plt.show()
     fig  # __st
-
-    # %%[markdown]
-    """
-    On the other hand, having multiple quantile values allows you to estimate the density of the data, since the difference between two adjacent quantiles represent the probability that a point lies between them, we can construct a piecewise function that approximates the density of the data.
-    """
+__st.markdown(r"""On the other hand, having multiple quantile values allows you to estimate the density of the data, since the difference between two adjacent quantiles represent the probability that a point lies between them, we can construct a piecewise function that approximates the density of the data.""")
 with __st.echo(), streambook.st_stdout('info'):
     def get_pdf(quantiles, q_values):
         densities = []
@@ -272,6 +267,7 @@ about the output distribution.
 * Take a look at Mixture Density Networks.
 * Learn more about [jax](https://github.com/google/jax) and [elegy](https://github.com/poets-ai/elegy).""")
 __toc.title('Quantile Regression')
+__toc.header('Motivation')
 __toc.header('Quantile Loss')
 __toc.header('Loss Landscape')
 __toc.header('Deep Quantile Regression')

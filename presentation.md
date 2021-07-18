@@ -117,7 +117,7 @@ $$
 
 ---
 
-<img src="https://raw.githubusercontent.com/cgarciae/quantile-regression/master/main_files/main_18_0.png">
+<img src="https://raw.githubusercontent.com/cgarciae/quantile-regression/master/main_files/main_19_0.png">
     
 
 ---

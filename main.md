@@ -1,5 +1,7 @@
 # Quantile Regression
+A simple method to estimate uncertainty in Machine Learning
 
+## Motivation
 When trying to predict and output it is some times useful to also get a confidence score
 or similarly a range of values around this expected value in which the true value might be found. 
 Practical examples of this include estimating upper and lower bound when predicting a 
@@ -20,6 +22,7 @@ import matplotlib.pyplot as plt
 
 plt.rcParams["figure.dpi"] = 300
 plt.rcParams["figure.facecolor"] = "white"
+np.random.seed(69)
 
 
 def create_data(multimodal: bool):
@@ -100,8 +103,6 @@ Now that we have this function lets explore the error landscape for a particular
 
 
 ```python
-
-
 def calculate_error(q):
     y_true = np.linspace(10, 20, 100)
     y_pred = np.linspace(10, 20, 200)
@@ -164,8 +165,6 @@ a set of user defined `quantiles`.
 
 
 ```python
-
-
 class QuantileLoss(elegy.Loss):
     def __init__(self, quantiles):
         super().__init__()
@@ -261,25 +260,19 @@ Amazing! Notice how the first few quantiles are tightly packed together while th
 
 
 ```python
-
+median_idx = np.where(np.isclose(quantiles, 0.5))[0]
 
 plt.fill_between(x_test, y_pred[:, -1], y_pred[:, 0], alpha=0.5, color="b")
 plt.scatter(x, y, s=20, facecolors="none", edgecolors="k")
 plt.plot(
     x_test,
-    y_pred[:, quantiles.index(0.5)],
+    y_pred[:, median_idx],
     color="r",
     linestyle="dashed",
-    label="median",
+    label="Q(0.5)",
 )
-
 plt.legend()
 plt.show()
-
-# %%[markdown]
-"""
-On the other hand, having multiple quantile values allows you to estimate the density of the data, since the difference between two adjacent quantiles represent the probability that a point lies between them, we can construct a piecewise function that approximates the density of the data.
-"""
 ```
 
 
@@ -288,12 +281,7 @@ On the other hand, having multiple quantile values allows you to estimate the de
     
 
 
-
-
-
-    '\nOn the other hand, having multiple quantile values allows you to estimate the density of the data, since the difference between two adjacent quantiles represent the probability that a point lies between them, we can construct a piecewise function that approximates the density of the data.\n'
-
-
+On the other hand, having multiple quantile values allows you to estimate the density of the data, since the difference between two adjacent quantiles represent the probability that a point lies between them, we can construct a piecewise function that approximates the density of the data.
 
 
 ```python
@@ -340,7 +328,7 @@ plt.show()
 
 
     
-![png](main_files/main_18_0.png)
+![png](main_files/main_19_0.png)
     
 
 

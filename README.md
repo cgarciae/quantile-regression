@@ -1,5 +1,7 @@
 # Quantile Regression
+A simple method to estimate uncertainty in Machine Learning
 
+## Motivation
 When trying to predict and output it is some times useful to also get a confidence score
 or similarly a range of values around this expected value in which the true value might be found. 
 Practical examples of this include estimating upper and lower bound when predicting a 
@@ -13,12 +15,15 @@ of our data: the quantiles.
 
 To begin our journey into quantile regression we will first get hold on some data:
 
+<details>
+<summary markdown="span">Show code</summary>
 
 ```python
 import numpy as np
 import matplotlib.pyplot as plt
 
 plt.rcParams["figure.dpi"] = 300
+plt.rcParams["figure.facecolor"] = "white"
 
 
 def create_data(multimodal: bool):
@@ -39,12 +44,9 @@ x, y = create_data(multimodal)
 plt.scatter(x[..., 0], y[..., 0], s=20, facecolors="none", edgecolors="k")
 plt.show()
 ```
+</details>
 
-
-    
-![png](README_files/README_1_0.png)
-    
-
+![png](https://raw.githubusercontent.com/cgarciae/quantile-regression/master/main_files/main_1_0.png)    
 
 Here we have a simple 2D dataset, however notice that `y` has some very peculiar statistical properties:
 
@@ -97,10 +99,10 @@ def quantile_loss(q, y_true, y_pred):
 ## Loss Landscape
 Now that we have this function lets explore the error landscape for a particular set of predictions. Here we will generate values for `y_true` in the range $[10, 20]$ and for a particular value of $q$ (0.8 by default) we will compute the total error you would get for each value `y_pred` could take. Ideally we want to find the the value of `y_pred` where the error is the smallest.
 
+<details>
+<summary markdown="span">Show code</summary>
 
 ```python
-
-
 def calculate_error(q):
     y_true = np.linspace(10, 20, 100)
     y_pred = np.linspace(10, 20, 200)
@@ -122,15 +124,9 @@ plt.gca().set_ylabel("loss")
 plt.title(f"Q({q:.2f}) = {q_true:.1f}")
 plt.show()
 ```
-
-    WARNING:absl:No GPU/TPU found, falling back to CPU. (Set TF_CPP_MIN_LOG_LEVEL=0 and rerun for more info.)
-
-
-
+</details>
     
-![png](README_files/README_5_1.png)
-    
-
+![png](https://raw.githubusercontent.com/cgarciae/quantile-regression/master/main_files/main_5_1.png)
 
 If we plot the error what we see is that the minumum of value of the quantile loss is exactly at the value of the $q$th quantile. It achieves this because the quantile loss is not symetrical, for quantiles above `0.5` it penalizes positive  errors stronger than negative errors, and the opposite is true for quantiles below `0.5`. In particular, quantile `0.5` is the median and its formula is equivalent to the MAE.
 
@@ -163,8 +159,6 @@ a set of user defined `quantiles`.
 
 
 ```python
-
-
 class QuantileLoss(elegy.Loss):
     def __init__(self, quantiles):
         super().__init__()
@@ -179,6 +173,8 @@ class QuantileLoss(elegy.Loss):
 
 Notice that we use the same `quantile_loss` that we created previously along with some `jax.vmap` magic to properly vectorize the function. Finally we are going to create a simple function that creates and trains our model for a set of quantiles using `elegy`.
 
+<details>
+<summary markdown="span">Show code</summary>
 
 ```python
 import optax
@@ -208,6 +204,7 @@ model = train_model(quantiles=quantiles, epochs=3001, lr=1e-4, eager=False)
 ```
 
 
+
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┓
 ┃<span style="font-weight: bold"> Layer                        </span>┃<span style="font-weight: bold"> Outputs Shape        </span>┃<span style="font-weight: bold"> Trainable        </span>┃<span style="font-weight: bold"> Non-trainable </span>┃
 ┃                              ┃                      ┃<span style="font-weight: bold"> Parameters       </span>┃<span style="font-weight: bold"> Parameters    </span>┃
@@ -228,14 +225,12 @@ model = train_model(quantiles=quantiles, epochs=3001, lr=1e-4, eager=False)
 <span style="font-weight: bold">                            Total Parameters: </span><span style="color: #008000; text-decoration-color: #008000; font-weight: bold">8,967</span><span style="font-weight: bold">   </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f; font-weight: bold">35.9 KB</span><span style="font-weight: bold">                             </span>
 </pre>
 
-
-
-    
-    
-
+</details>
 
 Now that we have a model lets generate some test data that spans the entire domain and compute the predicted quantiles.
 
+<details>
+<summary markdown="span">Show code</summary>
 
 ```python
 x_test = np.linspace(x.min(), x.max(), 100)
@@ -249,17 +244,44 @@ for i, q_values in enumerate(np.split(y_pred, len(quantiles), axis=-1)):
 plt.legend()
 plt.show()
 ```
+</details>
 
+
+![png](https://raw.githubusercontent.com/cgarciae/quantile-regression/master/main_files/main_13_0.png)
+
+Amazing! Notice how the first few quantiles are tightly packed together while the last ones spread out capturing the behavior of the exponential distribution. We can also visualize region between the highest and lowest quantiles, this gives use some bounds on our predictions.
+
+<details>
+<summary markdown="span">Show code</summary>
+
+```python
+median_idx = np.where(np.isclose(quantiles, 0.5))[0]
+
+plt.fill_between(x_test, y_pred[:, -1], y_pred[:, 0], alpha=0.5, color="b")
+plt.scatter(x, y, s=20, facecolors="none", edgecolors="k")
+plt.plot(
+    x_test,
+    y_pred[:, median_idx],
+    color="r",
+    linestyle="dashed",
+    label="median",
+)
+plt.legend()
+plt.show()
+```
+</details>
+
+
+On the other hand, having multiple quantile values allows you to estimate the density of the data, since the difference between two adjacent quantiles represent the probability that a point lies between them, we can construct a piecewise function that approximates the density of the data.
 
     
-![png](README_files/README_13_0.png)
-    
+![png](https://raw.githubusercontent.com/cgarciae/quantile-regression/master/main_files/main_15_0.png)
 
 
-Amazing! Notice how the first few quantiles are tightly packed together while the last ones spread out capturing the behavior of the exponential distribution. 
+On the other hand, having multiple quantile values allows you to estimate the density of the data, since the difference between two adjacent quantiles represent the probability that a point lies between them, we can construct a piecewise function that approximates the density of the data.
 
-Having the quantile values also allows you to estimate the density of the data, since the difference between two adjacent quantiles represent the probability that a point lies between them, we can construct a piecewise function that approximates the density of the data.
-
+<details>
+<summary markdown="span">Show code</summary>
 
 ```python
 def get_pdf(quantiles, q_values):
@@ -282,9 +304,12 @@ def piecewise(xs):
 def doubled(xs):
     return [np.clip(xs[i], 0, 3) for i in range(len(xs)) for _ in range(2)]
 ```
+</details>
 
 Now for a given `x` we can compute the quantile values and then use these to compute the conditional piecewise density function of `y` given `x`.
 
+<details>
+<summary markdown="span">Show code</summary>
 
 ```python
 xi = 7.0
@@ -302,11 +327,9 @@ plt.gca().set_xlabel("y")
 plt.gca().set_ylabel("p(y)")
 plt.show()
 ```
-
-
+</details>
     
-![png](README_files/README_17_0.png)
-    
+![png](https://raw.githubusercontent.com/cgarciae/quantile-regression/master/main_files/main_19_0.png)
 
 
 One of the nice properties of Quantile Regression is that we did not need to know a priori the output distribution and training is easy in comparison to other methods.
