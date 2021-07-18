@@ -24,6 +24,7 @@ import matplotlib.pyplot as plt
 
 plt.rcParams["figure.dpi"] = 300
 plt.rcParams["figure.facecolor"] = "white"
+np.random.seed(69)
 
 
 def create_data(multimodal: bool):
