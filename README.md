@@ -1,6 +1,10 @@
 # Quantile Regression
 A simple method to estimate uncertainty in Machine Learning
 
+<a href="https://colab.research.google.com/github/cgarciae/quantile-regression/blob/master/main.ipynb" target="_parent">
+    <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open in Colab"/>
+</a>
+
 ## Motivation
 When trying to predict and output it is some times useful to also get a confidence score
 or similarly a range of values around this expected value in which the true value might be found. 
