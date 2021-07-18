@@ -196,9 +196,29 @@ with __st.echo(), streambook.st_stdout('info'):
     plt.legend()
     plt.show()
     fig  # __st
-__st.markdown(r"""Amazing! Notice how the first few quantiles are tightly packed together while the last ones spread out capturing the behavior of the exponential distribution. 
+__st.markdown(r"""Amazing! Notice how the first few quantiles are tightly packed together while the last ones spread out capturing the behavior of the exponential distribution. We can also visualize region between the highest and lowest quantiles, this gives use some bounds on our predictions.""")
+with __st.echo(), streambook.st_stdout('info'):
 
-Having the quantile values also allows you to estimate the density of the data, since the difference between two adjacent quantiles represent the probability that a point lies between them, we can construct a piecewise function that approximates the density of the data.""")
+    fig = plt.figure()  # __st
+
+    plt.fill_between(x_test, y_pred[:, -1], y_pred[:, 0], alpha=0.5, color="b")
+    plt.scatter(x, y, s=20, facecolors="none", edgecolors="k")
+    plt.plot(
+        x_test,
+        y_pred[:, quantiles.index(0.5)],
+        color="r",
+        linestyle="dashed",
+        label="median",
+    )
+
+    plt.legend()
+    plt.show()
+    fig  # __st
+
+    # %%[markdown]
+    """
+    On the other hand, having multiple quantile values allows you to estimate the density of the data, since the difference between two adjacent quantiles represent the probability that a point lies between them, we can construct a piecewise function that approximates the density of the data.
+    """
 with __st.echo(), streambook.st_stdout('info'):
     def get_pdf(quantiles, q_values):
         densities = []
