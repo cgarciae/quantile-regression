@@ -217,18 +217,17 @@ Amazing! Notice how the first few quantiles are tightly packed together while th
 
 """
 # %%
-
+median_idx = np.where(np.isclose(quantiles, 0.5))[0]
 
 plt.fill_between(x_test, y_pred[:, -1], y_pred[:, 0], alpha=0.5, color="b")
 plt.scatter(x, y, s=20, facecolors="none", edgecolors="k")
 plt.plot(
     x_test,
-    y_pred[:, quantiles.index(0.5)],
+    y_pred[:, median_idx],
     color="r",
     linestyle="dashed",
     label="median",
 )
-
 plt.legend()
 plt.show()
 
