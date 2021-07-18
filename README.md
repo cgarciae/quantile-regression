@@ -310,6 +310,7 @@ def doubled(xs):
     return [np.clip(xs[i], 0, 3) for i in range(len(xs)) for _ in range(2)]
 ```
 </details>
+<br>
 
 Now for a given `x` we can compute the quantile values and then use these to compute the conditional piecewise density function of `y` given `x`.
 
