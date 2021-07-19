@@ -28,11 +28,11 @@ in this article, we will be exploring **Quantile Regression** as a means of doin
 and this technique will allow us to learn some critical statistical properties 
 of our data: the quantiles.
 
-To begin our journey into quantile regression, we will first get a hold on some data:
+To begin our journey into quantile regression, we will first get a hold on some data, and install the necessary libraries.:
 """
 # %%
-! curl -Ls https://raw.githubusercontent.com/cgarciae/quantile-regression/master/requirements.txt > requirements.txt
-! pip install -r requirements.txt
+! curl -Ls https://raw.githubusercontent.com/Davidnet/quantile-regression/master/requirements.txt > requirements.txt
+! pip install -qr requirements.txt
 
 # %%
 import numpy as np
