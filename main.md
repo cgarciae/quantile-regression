@@ -5,7 +5,10 @@ _A simple method to estimate uncertainty in Machine Learning_
     <img src="https://img.shields.io/badge/R-Open%20Repo-blue"/>
 </a>
 <a href="https://hackmd.io/@cgarciae/r1kFdNfRu" target="_parent">
-    <img src="https://img.shields.io/badge/B-View%20Blog-blue"/>
+    <img src="https://img.shields.io/badge/B-Open%20Blog-blue"/>
+</a>
+<a href="https://hackmd.io/@cgarciae/BJ2BJn1Au#/" target="_parent">
+    <img src="https://img.shields.io/badge/S-Open%20Slides-blue"/>
 </a>
 <a href="https://colab.research.google.com/github/cgarciae/quantile-regression/blob/master/main.ipynb" target="_parent">
     <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open in Colab"/>
