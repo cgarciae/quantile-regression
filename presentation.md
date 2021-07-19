@@ -1,5 +1,5 @@
 ---
-title: Quantile Regression
+title: Deep Quantile Regression
 tags: presentation
 slideOptions:
   theme: white
