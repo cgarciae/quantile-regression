@@ -240,6 +240,7 @@ model = train_model(quantiles=quantiles, epochs=3001, lr=1e-4, eager=False)
 </pre>
 
 </details>
+<br>
 
 Now that we have a model lets generate some test data that spans the entire domain and compute the predicted quantiles.
 
