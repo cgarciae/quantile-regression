@@ -285,7 +285,7 @@ plt.legend()
 plt.show()
 ```
 </details>
-
+<br>
 
 On the other hand, having multiple quantile values allows you to estimate the density of the data, since the difference between two adjacent quantiles represent the probability that a point lies between them, we can construct a piecewise function that approximates the density of the data.
 
