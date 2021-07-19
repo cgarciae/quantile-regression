@@ -1,9 +1,8 @@
+
 import streamlit as __st
 import streambook
-
 __toc = streambook.TOCSidebar()
-__st.markdown(
-    r"""# Quantile Regression
+__st.markdown(r"""# Quantile Regression
 _A simple method to estimate uncertainty in Machine Learning_
 
 <a href="https://github.com/cgarciae/quantile-regression" target="_parent">
@@ -21,26 +20,28 @@ _A simple method to estimate uncertainty in Machine Learning_
 
 
 ## Motivation
-When trying to predict and output it is some times useful to also get a confidence score
-or similarly a range of values around this expected value in which the true value might be found. 
-Practical examples of this include estimating upper and lower bound when predicting a 
-time of arrival (ETA) or a stock price since you not only care about an expected value 
-but also about the best case and worst case scenarios when trying to minimize risk.
+When trying to predict and output, it is sometimes helpful to get a confidence score
+or, similarly, a range of values around this expected value in which the actual value might be found. 
+Practical examples include estimating upper and lower bound when predicting a time of arrival (ETA) or a 
+stock price since you care about an expected value and the best case and worst-case scenarios when trying to minimize risk.
 
-While most Machine Learning techniques don't provide a natural way of doing this, 
-in this article we will be exploring **Quantile Regression** as a means of doing so, 
-this technique will allow us to learn some very important statistical properties 
+While most Machine Learning techniques do not provide a natural way of doing this, 
+in this article, we will be exploring **Quantile Regression** as a means of doing so; 
+and this technique will allow us to learn some critical statistical properties 
 of our data: the quantiles.
 
-To begin our journey into quantile regression we will first get hold on some data:"""
-)
-with __st.echo(), streambook.st_stdout("info"):
+To begin our journey into quantile regression, we will first get a hold on some data:""")
+with __st.echo(), streambook.st_stdout('info'):
+    ! curl -Ls https://raw.githubusercontent.com/cgarciae/quantile-regression/master/requirements.txt > requirements.txt
+    ! pip install -r requirements.txt
+with __st.echo(), streambook.st_stdout('info'):
     import numpy as np
     import matplotlib.pyplot as plt
 
     plt.rcParams["figure.dpi"] = 300
     plt.rcParams["figure.facecolor"] = "white"
     np.random.seed(69)
+
 
     @__st.cache
     def create_data(multimodal: bool):
@@ -53,6 +54,7 @@ with __st.echo(), streambook.st_stdout("info"):
 
         return x[..., None], y[..., None]
 
+
     multimodal: bool = False
     multimodal = __st.checkbox("Use multimodal data", False)
 
@@ -62,17 +64,16 @@ with __st.echo(), streambook.st_stdout("info"):
     plt.scatter(x[..., 0], y[..., 0], s=20, facecolors="none", edgecolors="k")
     plt.show()
     fig  # __st
-__st.markdown(
-    r"""Here we have a simple 2D dataset, however notice that `y` has some very peculiar statistical properties:
+__st.markdown(r"""Here we have a simple 2D dataset; however, notice that `y` has some very peculiar statistical properties:
 
-1. It is not normally distributed, infact it is exponentially distributed.
-2. The previous also means its noise it not symetric. 
-3. Its variance is not constant, it increases as `x` increases.
+1. The data does not have the property of being normally distributed. The data is exponentially distributed.
+2. The previous also means its noise is not symmetric.
+3. Its variance is not constant. It increases as x increases.
 
-When making prediction for this kind of data we might be very interested to know what range of values our data revolves around such that we can judge  if a specific outcome is expected or not, what are the best and worst case scenarios, etc.
+When making predictions for this kind of data, we might be very interested in knowing what range of values our data revolves around such that we can judge if a specific outcome is expected or not, what are the best and worst-case scenarios, and so on.
 
 ## Quantile Loss
-The only thing special about quantile regression really is its loss function, instead of the usual MAE or MSE losses for quantile regression we use the following function:
+The only thing special about quantile regression is its loss function. Instead of the usual MAE or MSE losses for quantile regression, we use the following function:
 
 $$
 \begin{aligned}
@@ -84,7 +85,7 @@ $$
 \end{aligned}
 $$
 
-Here $E$ is the error term and $L_q$ is the loss function for the quantile $q$. So what do we mean by this? Concretely it means that $L_q$ will bias $f(x)$ to output the value of the $q$'th quantile instead of the usual mean or median statistic. The big question is: how does it do it?
+Here $E$ is the error term, and $L_q$ is the loss function for the quantile $q$. So what do we mean by this? Concretely it means that $L_q$ will bias $f(x)$ to output the value of the $q$'th quantile instead of the usual mean or median statistic. The big question is: how does it do it?
 
 First lets notice that this formula can be rewritten as follows:
 
@@ -98,23 +99,18 @@ $$
 \end{aligned}
 $$
 
-Using $\max$ instead of a conditional statement will make it easier implement on tensor/array libraries, we will do this next in jax."""
-)
-with __st.echo(), streambook.st_stdout("info"):
+Using $\max$ instead of a conditional statement will make it more straightforward to implement on tensor/array libraries. We will do this next in jax.""")
+with __st.echo(), streambook.st_stdout('info'):
     import jax
     import jax.numpy as jnp
+
 
     def quantile_loss(q, y_true, y_pred):
         e = y_true - y_pred
         return jnp.maximum(q * e, (q - 1.0) * e)
-
-
-__st.markdown(
-    r"""## Loss Landscape
-Now that we have this function lets explore the error landscape for a particular set of predictions. Here we will generate values for `y_true` in the range $[10, 20]$ and for a particular value of $q$ (0.8 by default) we will compute the total error you would get for each value `y_pred` could take. Ideally we want to find the the value of `y_pred` where the error is the smallest."""
-)
-with __st.echo(), streambook.st_stdout("info"):
-
+__st.markdown(r"""## Loss Landscape
+Now that we have this function let us explore the error landscape for a particular set of predictions. Here we will generate values for `y_true` in the range $[10, 20]$, and for a particular value of $q$ (0.8 by default), we will compute the total error you would get for each value `y_pred` could take. Ideally, we want to find the value of `y_pred` where the error is the smallest.""")
+with __st.echo(), streambook.st_stdout('info'):
     @__st.cache
     def calculate_error(q):
         y_true = np.linspace(10, 20, 100)
@@ -124,6 +120,7 @@ with __st.echo(), streambook.st_stdout("info"):
         loss = loss.mean(axis=1)
 
         return y_true, y_pred, loss
+
 
     q = 0.8
     q = __st.slider("q", 0.001, 0.999, q)
@@ -138,15 +135,14 @@ with __st.echo(), streambook.st_stdout("info"):
     plt.title(f"Q({q:.2f}) = {q_true:.1f}")
     plt.show()
     fig  # __st
-__st.markdown(
-    r"""If we plot the error what we see is that the minumum of value of the quantile loss is exactly at the value of the $q$th quantile. It achieves this because the quantile loss is not symetrical, for quantiles above `0.5` it penalizes positive  errors stronger than negative errors, and the opposite is true for quantiles below `0.5`. In particular, quantile `0.5` is the median and its formula is equivalent to the MAE.
+__st.markdown(r"""If we plot the error, the quantile loss's minimum value is strictly at the value of the $q$th quantile. It achieves this because the quantile loss is not symmetrical; for quantiles above `0.5` it penalizes positive  errors stronger than negative errors, and the opposite is true for quantiles below `0.5`. In particular, quantile `0.5` is the median, and its formula is equivalent to the MAE.
 
 ## Deep Quantile Regression
 
-Generally you would have to create a model per quantile, however if we use a neural network we can have it output the predictions for all the quantiles at the same time. Here will use `elegy` to create a neural network with 2 hidden layers with `relu` activations and a linear layers with `n_quantiles` output units."""
-)
-with __st.echo(), streambook.st_stdout("info"):
+Generally, we would need to create to create a model per quantile. However, if we use a neural network, we can output the predictions for all the quantiles simultaneously. Here will use `elegy` to create a neural network with two hidden layers with `relu` activations and linear layers with `n_quantiles` output units.""")
+with __st.echo(), streambook.st_stdout('info'):
     import elegy
+
 
     class QuantileRegression(elegy.Module):
         def __init__(self, n_quantiles: int):
@@ -161,14 +157,9 @@ with __st.echo(), streambook.st_stdout("info"):
             x = elegy.nn.Linear(self.n_quantiles)(x)
 
             return x
-
-
-__st.markdown(
-    r"""Now we are going to properly define a `QuantileLoss` class that is parameterized by
-a set of user defined `quantiles`."""
-)
-with __st.echo(), streambook.st_stdout("info"):
-
+__st.markdown(r"""Now we will adequately define a `QuantileLoss` class that is parameterized by
+a set of user-defined `quantiles`.""")
+with __st.echo(), streambook.st_stdout('info'):
     class QuantileLoss(elegy.Loss):
         def __init__(self, quantiles):
             super().__init__()
@@ -179,13 +170,10 @@ with __st.echo(), streambook.st_stdout("info"):
                 self.quantiles, y_true[:, 0], y_pred
             )
             return jnp.sum(loss, axis=-1)
-
-
-__st.markdown(
-    r"""Notice that we use the same `quantile_loss` that we created previously along with some `jax.vmap` magic to properly vectorize the function. Finally we are going to create a simple function that creates and trains our model for a set of quantiles using `elegy`."""
-)
-with __st.echo(), streambook.st_stdout("info"):
+__st.markdown(r"""Notice that we use the same `quantile_loss` that we created previously, along with some `jax.vmap` magic to properly vectorize the function. Finally, we will create a simple function that creates and trains our model for a set of quantiles using `elegy`.""")
+with __st.echo(), streambook.st_stdout('info'):
     import optax
+
 
     @__st.cache(allow_output_mutation=True)
     def train_model(quantiles, epochs: int, lr: float, eager: bool):
@@ -202,16 +190,15 @@ with __st.echo(), streambook.st_stdout("info"):
 
         return model
 
+
     if not multimodal:
         quantiles = (0.05, 0.1, 0.3, 0.5, 0.7, 0.9, 0.95)
     else:
         quantiles = np.linspace(0.05, 0.95, 9)
 
     model = train_model(quantiles=quantiles, epochs=3001, lr=1e-4, eager=False)
-__st.markdown(
-    r"""Now that we have a model lets generate some test data that spans the entire domain and compute the predicted quantiles."""
-)
-with __st.echo(), streambook.st_stdout("info"):
+__st.markdown(r"""Now that we have a model let us generate some test data that spans the entire domain and compute the predicted quantiles.""")
+with __st.echo(), streambook.st_stdout('info'):
     x_test = np.linspace(x.min(), x.max(), 100)
     y_pred = model.predict(x_test[..., None])
 
@@ -224,10 +211,8 @@ with __st.echo(), streambook.st_stdout("info"):
     plt.legend()
     plt.show()
     fig  # __st
-__st.markdown(
-    r"""Amazing! Notice how the first few quantiles are tightly packed together while the last ones spread out capturing the behavior of the exponential distribution. We can also visualize region between the highest and lowest quantiles, this gives use some bounds on our predictions."""
-)
-with __st.echo(), streambook.st_stdout("info"):
+__st.markdown(r"""Amazing! Notice how the first few quantiles are tightly packed together while the last ones spread out, capturing the behavior of the exponential distribution. We can also visualize the region between the highest and lowest quantiles, and this gives us some bounds on our predictions.""")
+with __st.echo(), streambook.st_stdout('info'):
     median_idx = np.where(np.isclose(quantiles, 0.5))[0]
 
     fig = plt.figure()  # __st
@@ -243,11 +228,8 @@ with __st.echo(), streambook.st_stdout("info"):
     plt.legend()
     plt.show()
     fig  # __st
-__st.markdown(
-    r"""On the other hand, having multiple quantile values allows you to estimate the density of the data, since the difference between two adjacent quantiles represent the probability that a point lies between them, we can construct a piecewise function that approximates the density of the data."""
-)
-with __st.echo(), streambook.st_stdout("info"):
-
+__st.markdown(r"""On the other hand, having multiple quantile values allows us to estimate the density of the data. Since the difference between two adjacent quantiles represent the probability that a point lies between them, we can construct a piecewise function that approximates the density of the data.""")
+with __st.echo(), streambook.st_stdout('info'):
     def get_pdf(quantiles, q_values):
         densities = []
 
@@ -260,17 +242,15 @@ with __st.echo(), streambook.st_stdout("info"):
 
         return densities
 
+
     def piecewise(xs):
         return [xs[i + j] for i in range(len(xs) - 1) for j in range(2)]
 
+
     def doubled(xs):
         return [np.clip(xs[i], 0, 3) for i in range(len(xs)) for _ in range(2)]
-
-
-__st.markdown(
-    r"""Now for a given `x` we can compute the quantile values and then use these to compute the conditional piecewise density function of `y` given `x`."""
-)
-with __st.echo(), streambook.st_stdout("info"):
+__st.markdown(r"""For a given `x`, we can compute the quantile values and then use these to compute the conditional piecewise density function of `y` given `x`.""")
+with __st.echo(), streambook.st_stdout('info'):
     xi = 7.0
     xi = __st.slider("xi", 0.0001, 11.0, xi)
 
@@ -288,28 +268,26 @@ with __st.echo(), streambook.st_stdout("info"):
     plt.gca().set_ylabel("p(y)")
     plt.show()
     fig  # __st
-__st.markdown(
-    r"""One of the nice properties of Quantile Regression is that we did not need to know a priori the output distribution and training is easy in comparison to other methods.
+__st.markdown(r"""One of the exciting properties of Quantile Regression is that we did not need to know a priori the output distribution, and training is easy compared to other methods.
 
 ## Recap
 * Quantile Regression is a simple and effective method for learning some statistics
 about the output distribution.
-* It is specially useful to stablish bounds on the predictions of a model when risk management is desired.
+* It is advantageous to establish bounds on the predictions of a model when risk management is desired.
 * The Quantile Loss function is simple and easy to implement.
-* Quantile Regression can be efficiently implemented in using Neural Networks since a single model can be used to predict all the quantiles.
+* Quantile Regression can be efficiently implemented using Neural Networks since a single model can predict all the quantiles.
 * The quantiles can be used to estimate the conditional density of the data.
 
 ## Next Steps
 * Try running this notebook with `multimodal = True`.
 * Take a look at Mixture Density Networks.
-* Learn more about [jax](https://github.com/google/jax) and [elegy](https://github.com/poets-ai/elegy)."""
-)
-__toc.title("Quantile Regression")
-__toc.header("Motivation")
-__toc.header("Quantile Loss")
-__toc.header("Loss Landscape")
-__toc.header("Deep Quantile Regression")
-__toc.header("Recap")
-__toc.header("Next Steps")
+* Learn more about [jax](https://github.com/google/jax) and [elegy](https://github.com/poets-ai/elegy).""")
+__toc.title('Quantile Regression')
+__toc.header('Motivation')
+__toc.header('Quantile Loss')
+__toc.header('Loss Landscape')
+__toc.header('Deep Quantile Regression')
+__toc.header('Recap')
+__toc.header('Next Steps')
 
 __toc.generate()

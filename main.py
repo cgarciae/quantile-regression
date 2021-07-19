@@ -31,6 +31,10 @@ of our data: the quantiles.
 To begin our journey into quantile regression, we will first get a hold on some data:
 """
 # %%
+! curl -Ls https://raw.githubusercontent.com/cgarciae/quantile-regression/master/requirements.txt > requirements.txt
+! pip install -r requirements.txt
+
+# %%
 import numpy as np
 import matplotlib.pyplot as plt
 
