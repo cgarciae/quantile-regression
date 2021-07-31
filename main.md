@@ -29,6 +29,9 @@ of our data: the quantiles.
 
 To begin our journey into quantile regression we will first get hold on some data:
 
+<details>
+<summary markdown="span">Show code</summary>
+
 
 ```python
 import numpy as np
@@ -63,6 +66,8 @@ plt.show()
 ![png](main_files/main_1_0.png)
     
 
+
+</details>
 
 Here we have a simple 2D dataset, however notice that `y` has some very peculiar statistical properties:
 
@@ -115,6 +120,9 @@ def quantile_loss(q, y_true, y_pred):
 ## Loss Landscape
 Now that we have this function lets explore the error landscape for a particular set of predictions. Here we will generate values for `y_true` in the range $[10, 20]$ and for a particular value of $q$ (0.8 by default) we will compute the total error you would get for each value `y_pred` could take. Ideally we want to find the the value of `y_pred` where the error is the smallest.
 
+<details>
+<summary markdown="span">Show code</summary>
+
 
 ```python
 def calculate_error(q):
@@ -147,6 +155,8 @@ plt.show()
 ![png](main_files/main_5_1.png)
     
 
+
+</details>
 
 If we plot the error what we see is that the minumum of value of the quantile loss is exactly at the value of the $q$th quantile. It achieves this because the quantile loss is not symetrical, for quantiles above `0.5` it penalizes positive  errors stronger than negative errors, and the opposite is true for quantiles below `0.5`. In particular, quantile `0.5` is the median and its formula is equivalent to the MAE.
 
