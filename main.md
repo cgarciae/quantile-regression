@@ -15,6 +15,7 @@ _A simple method to estimate uncertainty in Machine Learning_
 </a>
 
 
+
 ## Motivation
 When trying to predict and output, it is sometimes helpful to get a confidence score
 or, similarly, a range of values around this expected value in which the actual value might be found. 
@@ -28,11 +29,17 @@ of our data: the quantiles.
 
 To begin our journey into quantile regression, we will first get a hold on some data, and install the necessary libraries.:
 
+<details>
+<summary markdown="span">Show code</summary>
+
 
 ```python
-! curl -Ls https://raw.githubusercontent.com/Davidnet/quantile-regression/master/requirements.txt > requirements.txt
-! pip install -qr requirements.txt
+# uncomment to install dependencies
+# ! curl -Ls https://raw.githubusercontent.com/Davidnet/quantile-regression/master/requirements.txt > requirements.txt
+# ! pip install -qr requirements.txt
 ```
+
+
 ```python
 import numpy as np
 import matplotlib.pyplot as plt
@@ -67,6 +74,7 @@ plt.show()
     
 
 
+</details>
 Here we have a simple 2D dataset; however, notice that `y` has some very peculiar statistical properties:
 
 1. The data does not have the property of being normally distributed. The data is exponentially distributed.
@@ -117,6 +125,8 @@ def quantile_loss(q, y_true, y_pred):
 
 ## Loss Landscape
 Now that we have this function let us explore the error landscape for a particular set of predictions. Here we will generate values for `y_true` in the range $[10, 20]$, and for a particular value of $q$ (0.8 by default), we will compute the total error you would get for each value `y_pred` could take. Ideally, we want to find the value of `y_pred` where the error is the smallest.
+<details>
+<summary markdown="span">Show code</summary>
 
 
 ```python
@@ -151,6 +161,7 @@ plt.show()
     
 
 
+</details>
 If we plot the error, the quantile loss's minimum value is strictly at the value of the $q$th quantile. It achieves this because the quantile loss is not symmetrical; for quantiles above `0.5` it penalizes positive  errors stronger than negative errors, and the opposite is true for quantiles below `0.5`. In particular, quantile `0.5` is the median, and its formula is equivalent to the MAE.
 
 ## Deep Quantile Regression

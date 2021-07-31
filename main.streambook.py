@@ -19,6 +19,7 @@ _A simple method to estimate uncertainty in Machine Learning_
 </a>
 
 
+
 ## Motivation
 When trying to predict and output, it is sometimes helpful to get a confidence score
 or, similarly, a range of values around this expected value in which the actual value might be found. 
@@ -30,10 +31,14 @@ in this article, we will be exploring **Quantile Regression** as a means of doin
 and this technique will allow us to learn some critical statistical properties 
 of our data: the quantiles.
 
-To begin our journey into quantile regression, we will first get a hold on some data, and install the necessary libraries.:""")
+To begin our journey into quantile regression, we will first get a hold on some data, and install the necessary libraries.:
+
+<details>
+<summary markdown="span">Show code</summary>""")
 with __st.echo(), streambook.st_stdout('info'):
-    ! curl -Ls https://raw.githubusercontent.com/Davidnet/quantile-regression/master/requirements.txt > requirements.txt
-    ! pip install -qr requirements.txt
+    # uncomment to install dependencies
+    # ! curl -Ls https://raw.githubusercontent.com/Davidnet/quantile-regression/master/requirements.txt > requirements.txt
+    # ! pip install -qr requirements.txt
 with __st.echo(), streambook.st_stdout('info'):
     import numpy as np
     import matplotlib.pyplot as plt
@@ -64,7 +69,8 @@ with __st.echo(), streambook.st_stdout('info'):
     plt.scatter(x[..., 0], y[..., 0], s=20, facecolors="none", edgecolors="k")
     plt.show()
     fig  # __st
-__st.markdown(r"""Here we have a simple 2D dataset; however, notice that `y` has some very peculiar statistical properties:
+__st.markdown(r"""</details>
+Here we have a simple 2D dataset; however, notice that `y` has some very peculiar statistical properties:
 
 1. The data does not have the property of being normally distributed. The data is exponentially distributed.
 2. The previous also means its noise is not symmetric.
@@ -109,7 +115,9 @@ with __st.echo(), streambook.st_stdout('info'):
         e = y_true - y_pred
         return jnp.maximum(q * e, (q - 1.0) * e)
 __st.markdown(r"""## Loss Landscape
-Now that we have this function let us explore the error landscape for a particular set of predictions. Here we will generate values for `y_true` in the range $[10, 20]$, and for a particular value of $q$ (0.8 by default), we will compute the total error you would get for each value `y_pred` could take. Ideally, we want to find the value of `y_pred` where the error is the smallest.""")
+Now that we have this function let us explore the error landscape for a particular set of predictions. Here we will generate values for `y_true` in the range $[10, 20]$, and for a particular value of $q$ (0.8 by default), we will compute the total error you would get for each value `y_pred` could take. Ideally, we want to find the value of `y_pred` where the error is the smallest.
+<details>
+<summary markdown="span">Show code</summary>""")
 with __st.echo(), streambook.st_stdout('info'):
     @__st.cache
     def calculate_error(q):
@@ -135,7 +143,8 @@ with __st.echo(), streambook.st_stdout('info'):
     plt.title(f"Q({q:.2f}) = {q_true:.1f}")
     plt.show()
     fig  # __st
-__st.markdown(r"""If we plot the error, the quantile loss's minimum value is strictly at the value of the $q$th quantile. It achieves this because the quantile loss is not symmetrical; for quantiles above `0.5` it penalizes positive  errors stronger than negative errors, and the opposite is true for quantiles below `0.5`. In particular, quantile `0.5` is the median, and its formula is equivalent to the MAE.
+__st.markdown(r"""</details>
+If we plot the error, the quantile loss's minimum value is strictly at the value of the $q$th quantile. It achieves this because the quantile loss is not symmetrical; for quantiles above `0.5` it penalizes positive  errors stronger than negative errors, and the opposite is true for quantiles below `0.5`. In particular, quantile `0.5` is the median, and its formula is equivalent to the MAE.
 
 ## Deep Quantile Regression
 
