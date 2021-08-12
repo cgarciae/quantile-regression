@@ -2,7 +2,18 @@
 import streamlit as __st
 import streambook
 __toc = streambook.TOCSidebar()
-__st.markdown(r"""# Quantile Regression
+__toc._add(streambook.H1('Quantile Regression'))
+__toc._add(streambook.H2('Motivation'))
+__toc._add(streambook.H2('Quantile Loss'))
+__toc._add(streambook.H2('Loss Landscape'))
+__toc._add(streambook.H2('Deep Quantile Regression'))
+__toc._add(streambook.H2('Recap'))
+__toc._add(streambook.H2('Next Steps'))
+__toc._add(streambook.H2('Acknowledgments'))
+
+__toc.generate()
+__st.markdown(r"""<span id='Quantile Regression'> </span><span id='Motivation'> </span>
+# Quantile Regression
 _A simple method to estimate uncertainty in Machine Learning_
 
 <a href="https://github.com/cgarciae/quantile-regression" target="_parent">
@@ -34,8 +45,9 @@ of our data: the quantiles.
 To begin our journey into quantile regression, we will first get a hold on some data, and install the necessary libraries.:
 
 <details>
-<summary markdown="span">Show code</summary>""")
+<summary markdown="span">Show code</summary>""", unsafe_allow_html=True)
 with __st.echo(), streambook.st_stdout('info'):
+    __st
     # uncomment to install dependencies
     # ! curl -Ls https://raw.githubusercontent.com/Davidnet/quantile-regression/master/requirements.txt > requirements.txt
     # ! pip install -qr requirements.txt
@@ -69,7 +81,8 @@ with __st.echo(), streambook.st_stdout('info'):
     plt.scatter(x[..., 0], y[..., 0], s=20, facecolors="none", edgecolors="k")
     plt.show()
     fig  # __st
-__st.markdown(r"""</details>
+__st.markdown(r"""<span id='Quantile Loss'> </span>
+</details>
 Here we have a simple 2D dataset; however, notice that `y` has some very peculiar statistical properties:
 
 1. The data does not have the property of being normally distributed. The data is exponentially distributed.
@@ -105,7 +118,7 @@ $$
 \end{aligned}
 $$
 
-Using $\max$ instead of a conditional statement will make it more straightforward to implement on tensor/array libraries. We will do this next in jax.""")
+Using $\max$ instead of a conditional statement will make it more straightforward to implement on tensor/array libraries. We will do this next in jax.""", unsafe_allow_html=True)
 with __st.echo(), streambook.st_stdout('info'):
     import jax
     import jax.numpy as jnp
@@ -114,10 +127,11 @@ with __st.echo(), streambook.st_stdout('info'):
     def quantile_loss(q, y_true, y_pred):
         e = y_true - y_pred
         return jnp.maximum(q * e, (q - 1.0) * e)
-__st.markdown(r"""## Loss Landscape
+__st.markdown(r"""<span id='Loss Landscape'> </span>
+## Loss Landscape
 Now that we have this function let us explore the error landscape for a particular set of predictions. Here we will generate values for `y_true` in the range $[10, 20]$, and for a particular value of $q$ (0.8 by default), we will compute the total error you would get for each value `y_pred` could take. Ideally, we want to find the value of `y_pred` where the error is the smallest.
 <details>
-<summary markdown="span">Show code</summary>""")
+<summary markdown="span">Show code</summary>""", unsafe_allow_html=True)
 with __st.echo(), streambook.st_stdout('info'):
     @__st.cache
     def calculate_error(q):
@@ -143,12 +157,13 @@ with __st.echo(), streambook.st_stdout('info'):
     plt.title(f"Q({q:.2f}) = {q_true:.1f}")
     plt.show()
     fig  # __st
-__st.markdown(r"""</details>
+__st.markdown(r"""<span id='Deep Quantile Regression'> </span>
+</details>
 If we plot the error, the quantile loss's minimum value is strictly at the value of the $q$th quantile. It achieves this because the quantile loss is not symmetrical; for quantiles above `0.5` it penalizes positive  errors stronger than negative errors, and the opposite is true for quantiles below `0.5`. In particular, quantile `0.5` is the median, and its formula is equivalent to the MAE.
 
 ## Deep Quantile Regression
 
-Generally, we would need to create to create a model per quantile. However, if we use a neural network, we can output the predictions for all the quantiles simultaneously. Here will use `elegy` to create a neural network with two hidden layers with `relu` activations and linear layers with `n_quantiles` output units.""")
+Generally, we would need to create to create a model per quantile. However, if we use a neural network, we can output the predictions for all the quantiles simultaneously. Here will use `elegy` to create a neural network with two hidden layers with `relu` activations and linear layers with `n_quantiles` output units.""", unsafe_allow_html=True)
 with __st.echo(), streambook.st_stdout('info'):
     import elegy
 
@@ -167,7 +182,7 @@ with __st.echo(), streambook.st_stdout('info'):
 
             return x
 __st.markdown(r"""Now we will adequately define a `QuantileLoss` class that is parameterized by
-a set of user-defined `quantiles`.""")
+a set of user-defined `quantiles`.""", unsafe_allow_html=True)
 with __st.echo(), streambook.st_stdout('info'):
     class QuantileLoss(elegy.Loss):
         def __init__(self, quantiles):
@@ -179,7 +194,7 @@ with __st.echo(), streambook.st_stdout('info'):
                 self.quantiles, y_true[:, 0], y_pred
             )
             return jnp.sum(loss, axis=-1)
-__st.markdown(r"""Notice that we use the same `quantile_loss` that we created previously, along with some `jax.vmap` magic to properly vectorize the function. Finally, we will create a simple function that creates and trains our model for a set of quantiles using `elegy`.""")
+__st.markdown(r"""Notice that we use the same `quantile_loss` that we created previously, along with some `jax.vmap` magic to properly vectorize the function. Finally, we will create a simple function that creates and trains our model for a set of quantiles using `elegy`.""", unsafe_allow_html=True)
 with __st.echo(), streambook.st_stdout('info'):
     import optax
 
@@ -206,7 +221,7 @@ with __st.echo(), streambook.st_stdout('info'):
         quantiles = np.linspace(0.05, 0.95, 9)
 
     model = train_model(quantiles=quantiles, epochs=3001, lr=1e-4, eager=False)
-__st.markdown(r"""Now that we have a model let us generate some test data that spans the entire domain and compute the predicted quantiles.""")
+__st.markdown(r"""Now that we have a model let us generate some test data that spans the entire domain and compute the predicted quantiles.""", unsafe_allow_html=True)
 with __st.echo(), streambook.st_stdout('info'):
     x_test = np.linspace(x.min(), x.max(), 100)
     y_pred = model.predict(x_test[..., None])
@@ -220,7 +235,7 @@ with __st.echo(), streambook.st_stdout('info'):
     plt.legend()
     plt.show()
     fig  # __st
-__st.markdown(r"""Amazing! Notice how the first few quantiles are tightly packed together while the last ones spread out, capturing the behavior of the exponential distribution. We can also visualize the region between the highest and lowest quantiles, and this gives us some bounds on our predictions.""")
+__st.markdown(r"""Amazing! Notice how the first few quantiles are tightly packed together while the last ones spread out, capturing the behavior of the exponential distribution. We can also visualize the region between the highest and lowest quantiles, and this gives us some bounds on our predictions.""", unsafe_allow_html=True)
 with __st.echo(), streambook.st_stdout('info'):
     median_idx = np.where(np.isclose(quantiles, 0.5))[0]
 
@@ -237,7 +252,7 @@ with __st.echo(), streambook.st_stdout('info'):
     plt.legend()
     plt.show()
     fig  # __st
-__st.markdown(r"""On the other hand, having multiple quantile values allows us to estimate the density of the data. Since the difference between two adjacent quantiles represent the probability that a point lies between them, we can construct a piecewise function that approximates the density of the data.""")
+__st.markdown(r"""On the other hand, having multiple quantile values allows us to estimate the density of the data. Since the difference between two adjacent quantiles represent the probability that a point lies between them, we can construct a piecewise function that approximates the density of the data.""", unsafe_allow_html=True)
 with __st.echo(), streambook.st_stdout('info'):
     def get_pdf(quantiles, q_values):
         densities = []
@@ -258,7 +273,7 @@ with __st.echo(), streambook.st_stdout('info'):
 
     def doubled(xs):
         return [np.clip(xs[i], 0, 3) for i in range(len(xs)) for _ in range(2)]
-__st.markdown(r"""For a given `x`, we can compute the quantile values and then use these to compute the conditional piecewise density function of `y` given `x`.""")
+__st.markdown(r"""For a given `x`, we can compute the quantile values and then use these to compute the conditional piecewise density function of `y` given `x`.""", unsafe_allow_html=True)
 with __st.echo(), streambook.st_stdout('info'):
     xi = 7.0
     xi = __st.slider("xi", 0.0001, 11.0, xi)
@@ -277,7 +292,8 @@ with __st.echo(), streambook.st_stdout('info'):
     plt.gca().set_ylabel("p(y)")
     plt.show()
     fig  # __st
-__st.markdown(r"""One of the exciting properties of Quantile Regression is that we did not need to know a priori the output distribution, and training is easy compared to other methods.
+__st.markdown(r"""<span id='Recap'> </span><span id='Next Steps'> </span><span id='Acknowledgments'> </span>
+One of the exciting properties of Quantile Regression is that we did not need to know a priori the output distribution, and training is easy compared to other methods.
 
 ## Recap
 * Quantile Regression is a simple and effective method for learning some statistics
@@ -290,13 +306,8 @@ about the output distribution.
 ## Next Steps
 * Try running this notebook with `multimodal = True`.
 * Take a look at Mixture Density Networks.
-* Learn more about [jax](https://github.com/google/jax) and [elegy](https://github.com/poets-ai/elegy).""")
-__toc.title('Quantile Regression')
-__toc.header('Motivation')
-__toc.header('Quantile Loss')
-__toc.header('Loss Landscape')
-__toc.header('Deep Quantile Regression')
-__toc.header('Recap')
-__toc.header('Next Steps')
+* Learn more about [jax](https://github.com/google/jax) and [elegy](https://github.com/poets-ai/elegy).
 
-__toc.generate()
+## Acknowledgments
+* Many thanks to [David Cardozo](https://github.com/davidnet) for his proofreading and getting the notebook to run in colab.""", unsafe_allow_html=True)
+

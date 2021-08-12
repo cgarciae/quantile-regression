@@ -35,6 +35,7 @@ To begin our journey into quantile regression, we will first get a hold on some 
 <summary markdown="span">Show code</summary>
 """
 # %%
+__st
 # uncomment to install dependencies
 ## ! curl -Ls https://raw.githubusercontent.com/Davidnet/quantile-regression/master/requirements.txt > requirements.txt
 ## ! pip install -qr requirements.txt
@@ -330,4 +331,7 @@ about the output distribution.
 * Try running this notebook with `multimodal = True`.
 * Take a look at Mixture Density Networks.
 * Learn more about [jax](https://github.com/google/jax) and [elegy](https://github.com/poets-ai/elegy).
+
+## Acknowledgments
+* Many thanks to [David Cardozo](https://github.com/davidnet) for his proofreading and getting the notebook to run in colab.
 """
