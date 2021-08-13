@@ -80,17 +80,12 @@ with __st.echo(), streambook.st_stdout('info'):
 
     x, y = create_data(multimodal)
 
-    def show_plot():
-        fig = plt.figure()  # __st
-        plt.scatter(x[..., 0], y[..., 0], s=20, facecolors="none", edgecolors="k")
-        plt.show()
-        return fig  # __st
+    fig = plt.figure()
+    plt.scatter(x[..., 0], y[..., 0], s=20, facecolors="none", edgecolors="k")
+    plt.close()
 __st.markdown(r"""</details>""", unsafe_allow_html=True)
 with __st.echo(), streambook.st_stdout('info'):
-    fig = [  # __st
-    show_plot()
-    ][0]  # __st
-    fig  # __st
+    fig
 __st.markdown(r"""<span id='Quantile Loss'> </span>
 Here we have a simple 2D dataset; however, notice that `y` has some very peculiar statistical properties:
 
@@ -159,21 +154,16 @@ with __st.echo(), streambook.st_stdout('info'):
     q_true = np.quantile(y_true, q)
 
 
-    def show_plot():
-        fig = plt.figure()  # __st
-        plt.plot(y_pred, loss)
-        plt.vlines(q_true, 0, loss.max(), linestyles="dashed", colors="k")
-        plt.gca().set_xlabel("y_pred")
-        plt.gca().set_ylabel("loss")
-        plt.title(f"Q({q:.2f}) = {q_true:.1f}")
-        plt.show()
-        return fig  # __st
+    fig = plt.figure()  # __st
+    plt.plot(y_pred, loss)
+    plt.vlines(q_true, 0, loss.max(), linestyles="dashed", colors="k")
+    plt.gca().set_xlabel("y_pred")
+    plt.gca().set_ylabel("loss")
+    plt.title(f"Q({q:.2f}) = {q_true:.1f}")
+    plt.show()
 __st.markdown(r"""</details>""", unsafe_allow_html=True)
 with __st.echo(), streambook.st_stdout('info'):
-    fig = [  # __st
-    show_plot()
-    ][0]  # __st
-    fig  # __st
+    fig
 __st.markdown(r"""<span id='Deep Quantile Regression'> </span>
 If we plot the error, the quantile loss's minimum value is strictly at the value of the $q$th quantile. It achieves this because the quantile loss is not symmetrical; for quantiles above `0.5` it penalizes positive  errors stronger than negative errors, and the opposite is true for quantiles below `0.5`. In particular, quantile `0.5` is the median, and its formula is equivalent to the MAE.
 
@@ -251,22 +241,17 @@ with __st.echo(), streambook.st_stdout('info'):
     x_test = np.linspace(x.min(), x.max(), 100)
     y_pred = model.predict(x_test[..., None])
 
-    def show_plot():
-        fig = plt.figure()  # __st
-        plt.scatter(x, y, s=20, facecolors="none", edgecolors="k")
+    fig = plt.figure()  # __st
+    plt.scatter(x, y, s=20, facecolors="none", edgecolors="k")
 
-        for i, q_values in enumerate(np.split(y_pred, len(quantiles), axis=-1)):
-            plt.plot(x_test, q_values[:, 0], linewidth=2, label=f"Q({quantiles[i]:.2f})")
+    for i, q_values in enumerate(np.split(y_pred, len(quantiles), axis=-1)):
+        plt.plot(x_test, q_values[:, 0], linewidth=2, label=f"Q({quantiles[i]:.2f})")
 
-        plt.legend()
-        plt.show()
-        return fig  # __st
+    plt.legend()
+    plt.show()
 __st.markdown(r"""</details>""", unsafe_allow_html=True)
 with __st.echo(), streambook.st_stdout('info'):
-    fig = [  # __st
-    show_plot()
-    ][0]  # __st
-    fig  # __st
+    fig
 __st.markdown(r"""Amazing! Notice how the first few quantiles are tightly packed together while the last ones spread out, capturing the behavior of the exponential distribution. We can also visualize the region between the highest and lowest quantiles, and this gives us some bounds on our predictions.
 
 <details>
@@ -274,26 +259,21 @@ __st.markdown(r"""Amazing! Notice how the first few quantiles are tightly packed
 with __st.echo(), streambook.st_stdout('info'):
     median_idx = np.where(np.isclose(quantiles, 0.5))[0]
 
-    def show_plot():
-        fig = plt.figure()  # __st
-        plt.fill_between(x_test, y_pred[:, -1], y_pred[:, 0], alpha=0.5, color="b")
-        plt.scatter(x, y, s=20, facecolors="none", edgecolors="k")
-        plt.plot(
-            x_test,
-            y_pred[:, median_idx],
-            color="r",
-            linestyle="dashed",
-            label="Q(0.5)",
-        )
-        plt.legend()
-        plt.show()
-        return fig  # __st
+    fig = plt.figure()  # __st
+    plt.fill_between(x_test, y_pred[:, -1], y_pred[:, 0], alpha=0.5, color="b")
+    plt.scatter(x, y, s=20, facecolors="none", edgecolors="k")
+    plt.plot(
+        x_test,
+        y_pred[:, median_idx],
+        color="r",
+        linestyle="dashed",
+        label="Q(0.5)",
+    )
+    plt.legend()
+    plt.show()
 __st.markdown(r"""</details>""", unsafe_allow_html=True)
 with __st.echo(), streambook.st_stdout('info'):
-    fig = [  # __st
-    show_plot()
-    ][0]  # __st
-    fig  # __st
+    fig
 __st.markdown(r"""On the other hand, having multiple quantile values allows us to estimate the density of the data. Since the difference between two adjacent quantiles represent the probability that a point lies between them, we can construct a piecewise function that approximates the density of the data.
 
 <details>
@@ -331,23 +311,18 @@ with __st.echo(), streambook.st_stdout('info'):
 
     densities = get_pdf(quantiles, q_values)
 
-    def show_plot():
-        fig = plt.figure()  # __st
-        plt.title(f"x = {xi}")
-        plt.fill_between(piecewise(q_values), 0, doubled(densities))
-        # plt.fill_between(q_values, 0, densities + [0])
-        # plt.plot(q_values, densities + [0], color="k")
-        plt.xlim(0, y.max())
-        plt.gca().set_xlabel("y")
-        plt.gca().set_ylabel("p(y)")
-        plt.show()
-        return fig  # __st
+    fig = plt.figure()  # __st
+    plt.title(f"x = {xi}")
+    plt.fill_between(piecewise(q_values), 0, doubled(densities))
+    # plt.fill_between(q_values, 0, densities + [0])
+    # plt.plot(q_values, densities + [0], color="k")
+    plt.xlim(0, y.max())
+    plt.gca().set_xlabel("y")
+    plt.gca().set_ylabel("p(y)")
+    plt.show()
 __st.markdown(r"""</details>""", unsafe_allow_html=True)
 with __st.echo(), streambook.st_stdout('info'):
-    fig = [  # __st
-    show_plot()
-    ][0]  # __st
-    fig  # __st
+    fig
 __st.markdown(r"""<span id='Recap'> </span><span id='Next Steps'> </span><span id='Acknowledgments'> </span>
 One of the exciting properties of Quantile Regression is that we did not need to know a priori the output distribution, and training is easy compared to other methods.
 

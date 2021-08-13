@@ -72,16 +72,17 @@ multimodal: bool = False
 
 x, y = create_data(multimodal)
 
-def show_plot():
-    plt.scatter(x[..., 0], y[..., 0], s=20, facecolors="none", edgecolors="k")
-    plt.show()
+fig = plt.figure()
+plt.scatter(x[..., 0], y[..., 0], s=20, facecolors="none", edgecolors="k")
+plt.close()
+
 
 # %% [markdown]
 """
 </details>
 """
 # %%
-show_plot()
+fig
 
 # %% [markdown]
 """
@@ -131,6 +132,7 @@ def quantile_loss(q, y_true, y_pred):
     e = y_true - y_pred
     return jnp.maximum(q * e, (q - 1.0) * e)
 
+
 # %% [markdown]
 """
 ## Loss Landscape
@@ -157,13 +159,12 @@ y_true, y_pred, loss = calculate_error(q)
 q_true = np.quantile(y_true, q)
 
 
-def show_plot():
-    plt.plot(y_pred, loss)
-    plt.vlines(q_true, 0, loss.max(), linestyles="dashed", colors="k")
-    plt.gca().set_xlabel("y_pred")
-    plt.gca().set_ylabel("loss")
-    plt.title(f"Q({q:.2f}) = {q_true:.1f}")
-    plt.show()
+plt.plot(y_pred, loss)
+plt.vlines(q_true, 0, loss.max(), linestyles="dashed", colors="k")
+plt.gca().set_xlabel("y_pred")
+plt.gca().set_ylabel("loss")
+plt.title(f"Q({q:.2f}) = {q_true:.1f}")
+plt.show()
 
 
 # %% [markdown]
@@ -171,7 +172,7 @@ def show_plot():
 </details>
 """
 # %%
-show_plot()
+fig
 
 # %% [markdown]
 """
@@ -220,6 +221,7 @@ class QuantileLoss(elegy.Loss):
             self.quantiles, y_true[:, 0], y_pred
         )
         return jnp.sum(loss, axis=-1)
+
 
 # %% [markdown]
 """
@@ -278,21 +280,20 @@ Now that we have a model let us generate some test data that spans the entire do
 x_test = np.linspace(x.min(), x.max(), 100)
 y_pred = model.predict(x_test[..., None])
 
-def show_plot():
-    plt.scatter(x, y, s=20, facecolors="none", edgecolors="k")
+plt.scatter(x, y, s=20, facecolors="none", edgecolors="k")
 
-    for i, q_values in enumerate(np.split(y_pred, len(quantiles), axis=-1)):
-        plt.plot(x_test, q_values[:, 0], linewidth=2, label=f"Q({quantiles[i]:.2f})")
+for i, q_values in enumerate(np.split(y_pred, len(quantiles), axis=-1)):
+    plt.plot(x_test, q_values[:, 0], linewidth=2, label=f"Q({quantiles[i]:.2f})")
 
-    plt.legend()
-    plt.show()
+plt.legend()
+plt.show()
 
 # %% [markdown]
 """
 </details>
 """
 # %%
-show_plot()
+fig
 # %% [markdown]
 """
 Amazing! Notice how the first few quantiles are tightly packed together while the last ones spread out, capturing the behavior of the exponential distribution. We can also visualize the region between the highest and lowest quantiles, and this gives us some bounds on our predictions.
@@ -303,25 +304,24 @@ Amazing! Notice how the first few quantiles are tightly packed together while th
 # %%
 median_idx = np.where(np.isclose(quantiles, 0.5))[0]
 
-def show_plot():
-    plt.fill_between(x_test, y_pred[:, -1], y_pred[:, 0], alpha=0.5, color="b")
-    plt.scatter(x, y, s=20, facecolors="none", edgecolors="k")
-    plt.plot(
-        x_test,
-        y_pred[:, median_idx],
-        color="r",
-        linestyle="dashed",
-        label="Q(0.5)",
-    )
-    plt.legend()
-    plt.show()
+plt.fill_between(x_test, y_pred[:, -1], y_pred[:, 0], alpha=0.5, color="b")
+plt.scatter(x, y, s=20, facecolors="none", edgecolors="k")
+plt.plot(
+    x_test,
+    y_pred[:, median_idx],
+    color="r",
+    linestyle="dashed",
+    label="Q(0.5)",
+)
+plt.legend()
+plt.show()
 
 # %% [markdown]
 """
 </details>
 """
 # %%
-show_plot()
+fig
 # %% [markdown]
 """
 On the other hand, having multiple quantile values allows us to estimate the density of the data. Since the difference between two adjacent quantiles represent the probability that a point lies between them, we can construct a piecewise function that approximates the density of the data.
@@ -350,6 +350,7 @@ def piecewise(xs):
 def doubled(xs):
     return [np.clip(xs[i], 0, 3) for i in range(len(xs)) for _ in range(2)]
 
+
 # %% [markdown]
 """
 </details>
@@ -368,22 +369,21 @@ q_values = model.predict(np.array([[xi]]))[0].tolist()
 
 densities = get_pdf(quantiles, q_values)
 
-def show_plot():
-    plt.title(f"x = {xi}")
-    plt.fill_between(piecewise(q_values), 0, doubled(densities))
-    # plt.fill_between(q_values, 0, densities + [0])
-    # plt.plot(q_values, densities + [0], color="k")
-    plt.xlim(0, y.max())
-    plt.gca().set_xlabel("y")
-    plt.gca().set_ylabel("p(y)")
-    plt.show()
+plt.title(f"x = {xi}")
+plt.fill_between(piecewise(q_values), 0, doubled(densities))
+# plt.fill_between(q_values, 0, densities + [0])
+# plt.plot(q_values, densities + [0], color="k")
+plt.xlim(0, y.max())
+plt.gca().set_xlabel("y")
+plt.gca().set_ylabel("p(y)")
+plt.show()
 
 # %% [markdown]
 """
 </details>
 """
 # %%
-show_plot()
+fig
 # %% [markdown]
 """
 One of the exciting properties of Quantile Regression is that we did not need to know a priori the output distribution, and training is easy compared to other methods.
