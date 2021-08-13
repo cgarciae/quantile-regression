@@ -83,7 +83,7 @@ show_plot()
 
 
     
-![png](https://raw.githubusercontent.com/cgarciae/quantile-regression/master/main_files/main_6_0.png)
+![png](https://raw.githubusercontent.com/cgarciae/quantile-regression/master/README_files/README_6_0.png)
     
 
 
@@ -179,7 +179,7 @@ show_plot()
 
 
     
-![png](https://raw.githubusercontent.com/cgarciae/quantile-regression/master/main_files/main_13_0.png)
+![png](https://raw.githubusercontent.com/cgarciae/quantile-regression/master/README_files/README_13_0.png)
     
 
 
@@ -325,7 +325,7 @@ show_plot()
 
 
     
-![png](https://raw.githubusercontent.com/cgarciae/quantile-regression/master/main_files/main_28_0.png)
+![png](https://raw.githubusercontent.com/cgarciae/quantile-regression/master/README_files/README_28_0.png)
     
 
 
@@ -361,7 +361,7 @@ show_plot()
 
 
     
-![png](https://raw.githubusercontent.com/cgarciae/quantile-regression/master/main_files/main_32_0.png)
+![png](https://raw.githubusercontent.com/cgarciae/quantile-regression/master/README_files/README_32_0.png)
     
 
 
@@ -428,7 +428,7 @@ show_plot()
 
 
     
-![png](https://raw.githubusercontent.com/cgarciae/quantile-regression/master/main_files/main_39_0.png)
+![png](https://raw.githubusercontent.com/cgarciae/quantile-regression/master/README_files/README_39_0.png)
     
 
 
