@@ -49,9 +49,10 @@ To begin our journey into quantile regression, we will first get a hold on some 
 ```python
 import numpy as np
 import matplotlib.pyplot as plt
+import os
 
-plt.rcParams["figure.dpi"] = 300
-plt.rcParams["figure.facecolor"] = "white"
+plt.rcParams["figure.dpi"] = int(os.environ.get("FIGURE_DPI", 100))
+plt.rcParams["figure.facecolor"] = os.environ.get("FIGURE_FACECOLOR", "white")
 np.random.seed(69)
 
 
