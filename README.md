@@ -162,6 +162,7 @@ y_true, y_pred, loss = calculate_error(q)
 q_true = np.quantile(y_true, q)
 
 
+fig = plt.figure()
 plt.plot(y_pred, loss)
 plt.vlines(q_true, 0, loss.max(), linestyles="dashed", colors="k")
 plt.gca().set_xlabel("y_pred")
@@ -312,6 +313,7 @@ Now that we have a model let us generate some test data that spans the entire do
 x_test = np.linspace(x.min(), x.max(), 100)
 y_pred = model.predict(x_test[..., None])
 
+fig = plt.figure()
 plt.scatter(x, y, s=20, facecolors="none", edgecolors="k")
 
 for i, q_values in enumerate(np.split(y_pred, len(quantiles), axis=-1)):
@@ -346,6 +348,7 @@ Amazing! Notice how the first few quantiles are tightly packed together while th
 ```python
 median_idx = np.where(np.isclose(quantiles, 0.5))[0]
 
+fig = plt.figure()
 plt.fill_between(x_test, y_pred[:, -1], y_pred[:, 0], alpha=0.5, color="b")
 plt.scatter(x, y, s=20, facecolors="none", edgecolors="k")
 plt.plot(
@@ -418,6 +421,7 @@ q_values = model.predict(np.array([[xi]]))[0].tolist()
 
 densities = get_pdf(quantiles, q_values)
 
+fig = plt.figure()
 plt.title(f"x = {xi}")
 plt.fill_between(piecewise(q_values), 0, doubled(densities))
 # plt.fill_between(q_values, 0, densities + [0])
