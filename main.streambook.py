@@ -42,15 +42,18 @@ in this article, we will be exploring **Quantile Regression** as a means of doin
 and this technique will allow us to learn some critical statistical properties 
 of our data: the quantiles.
 
-To begin our journey into quantile regression, we will first get a hold on some data, and install the necessary libraries.:
-
 <details>
-<summary markdown="span">Show code</summary>""", unsafe_allow_html=True)
+<summary markdown="span">Install Dependencies</summary>""", unsafe_allow_html=True)
 with __st.echo(), streambook.st_stdout('info'):
-    __st
+    _ = __st
     # uncomment to install dependencies
     # ! curl -Ls https://raw.githubusercontent.com/Davidnet/quantile-regression/master/requirements.txt > requirements.txt
     # ! pip install -qr requirements.txt
+__st.markdown(r"""</details>""", unsafe_allow_html=True)
+__st.markdown(r"""To begin our journey into quantile regression, we will first get a hold on some data:
+
+<details>
+<summary markdown="span">Show Code</summary>""", unsafe_allow_html=True)
 with __st.echo(), streambook.st_stdout('info'):
     import numpy as np
     import matplotlib.pyplot as plt
@@ -77,12 +80,18 @@ with __st.echo(), streambook.st_stdout('info'):
 
     x, y = create_data(multimodal)
 
-    fig = plt.figure()  # __st
-    plt.scatter(x[..., 0], y[..., 0], s=20, facecolors="none", edgecolors="k")
-    plt.show()
+    def show_plot():
+        fig = plt.figure()  # __st
+        plt.scatter(x[..., 0], y[..., 0], s=20, facecolors="none", edgecolors="k")
+        plt.show()
+        return fig  # __st
+__st.markdown(r"""</details>""", unsafe_allow_html=True)
+with __st.echo(), streambook.st_stdout('info'):
+    fig = [  # __st
+    show_plot()
+    ][0]  # __st
     fig  # __st
 __st.markdown(r"""<span id='Quantile Loss'> </span>
-</details>
 Here we have a simple 2D dataset; however, notice that `y` has some very peculiar statistical properties:
 
 1. The data does not have the property of being normally distributed. The data is exponentially distributed.
@@ -129,8 +138,8 @@ with __st.echo(), streambook.st_stdout('info'):
         return jnp.maximum(q * e, (q - 1.0) * e)
 __st.markdown(r"""<span id='Loss Landscape'> </span>
 ## Loss Landscape
-Now that we have this function let us explore the error landscape for a particular set of predictions. Here we will generate values for `y_true` in the range $[10, 20]$, and for a particular value of $q$ (0.8 by default), we will compute the total error you would get for each value `y_pred` could take. Ideally, we want to find the value of `y_pred` where the error is the smallest.
-<details>
+Now that we have this function let us explore the error landscape for a particular set of predictions. Here we will generate values for `y_true` in the range $[10, 20]$, and for a particular value of $q$ (0.8 by default), we will compute the total error you would get for each value `y_pred` could take. Ideally, we want to find the value of `y_pred` where the error is the smallest.""", unsafe_allow_html=True)
+__st.markdown(r"""<details>
 <summary markdown="span">Show code</summary>""", unsafe_allow_html=True)
 with __st.echo(), streambook.st_stdout('info'):
     @__st.cache
@@ -149,16 +158,23 @@ with __st.echo(), streambook.st_stdout('info'):
     y_true, y_pred, loss = calculate_error(q)
     q_true = np.quantile(y_true, q)
 
-    fig = plt.figure()  # __st
-    plt.plot(y_pred, loss)
-    plt.vlines(q_true, 0, loss.max(), linestyles="dashed", colors="k")
-    plt.gca().set_xlabel("y_pred")
-    plt.gca().set_ylabel("loss")
-    plt.title(f"Q({q:.2f}) = {q_true:.1f}")
-    plt.show()
+
+    def show_plot():
+        fig = plt.figure()  # __st
+        plt.plot(y_pred, loss)
+        plt.vlines(q_true, 0, loss.max(), linestyles="dashed", colors="k")
+        plt.gca().set_xlabel("y_pred")
+        plt.gca().set_ylabel("loss")
+        plt.title(f"Q({q:.2f}) = {q_true:.1f}")
+        plt.show()
+        return fig  # __st
+__st.markdown(r"""</details>""", unsafe_allow_html=True)
+with __st.echo(), streambook.st_stdout('info'):
+    fig = [  # __st
+    show_plot()
+    ][0]  # __st
     fig  # __st
 __st.markdown(r"""<span id='Deep Quantile Regression'> </span>
-</details>
 If we plot the error, the quantile loss's minimum value is strictly at the value of the $q$th quantile. It achieves this because the quantile loss is not symmetrical; for quantiles above `0.5` it penalizes positive  errors stronger than negative errors, and the opposite is true for quantiles below `0.5`. In particular, quantile `0.5` is the median, and its formula is equivalent to the MAE.
 
 ## Deep Quantile Regression
@@ -182,7 +198,10 @@ with __st.echo(), streambook.st_stdout('info'):
 
             return x
 __st.markdown(r"""Now we will adequately define a `QuantileLoss` class that is parameterized by
-a set of user-defined `quantiles`.""", unsafe_allow_html=True)
+a set of user-defined `quantiles`.
+
+<details>
+<summary markdown="span">Show code</summary>""", unsafe_allow_html=True)
 with __st.echo(), streambook.st_stdout('info'):
     class QuantileLoss(elegy.Loss):
         def __init__(self, quantiles):
@@ -194,7 +213,10 @@ with __st.echo(), streambook.st_stdout('info'):
                 self.quantiles, y_true[:, 0], y_pred
             )
             return jnp.sum(loss, axis=-1)
+__st.markdown(r"""</details>""", unsafe_allow_html=True)
 __st.markdown(r"""Notice that we use the same `quantile_loss` that we created previously, along with some `jax.vmap` magic to properly vectorize the function. Finally, we will create a simple function that creates and trains our model for a set of quantiles using `elegy`.""", unsafe_allow_html=True)
+__st.markdown(r"""<details>
+<summary markdown="span">Show code</summary>""", unsafe_allow_html=True)
 with __st.echo(), streambook.st_stdout('info'):
     import optax
 
@@ -207,8 +229,6 @@ with __st.echo(), streambook.st_stdout('info'):
             optimizer=optax.adamw(lr),
             run_eagerly=eager,
         )
-        model.init(x, y)
-        model.summary(x)
 
         model.fit(x, y, epochs=epochs, batch_size=64, verbose=0)
 
@@ -221,38 +241,63 @@ with __st.echo(), streambook.st_stdout('info'):
         quantiles = np.linspace(0.05, 0.95, 9)
 
     model = train_model(quantiles=quantiles, epochs=3001, lr=1e-4, eager=False)
+__st.markdown(r"""</details>""", unsafe_allow_html=True)
+with __st.echo(), streambook.st_stdout('info'):
+    model.summary(x)
 __st.markdown(r"""Now that we have a model let us generate some test data that spans the entire domain and compute the predicted quantiles.""", unsafe_allow_html=True)
+__st.markdown(r"""<details>
+<summary markdown="span">Show code</summary>""", unsafe_allow_html=True)
 with __st.echo(), streambook.st_stdout('info'):
     x_test = np.linspace(x.min(), x.max(), 100)
     y_pred = model.predict(x_test[..., None])
 
-    fig = plt.figure()  # __st
-    plt.scatter(x, y, s=20, facecolors="none", edgecolors="k")
+    def show_plot():
+        fig = plt.figure()  # __st
+        plt.scatter(x, y, s=20, facecolors="none", edgecolors="k")
 
-    for i, q_values in enumerate(np.split(y_pred, len(quantiles), axis=-1)):
-        plt.plot(x_test, q_values[:, 0], linewidth=2, label=f"Q({quantiles[i]:.2f})")
+        for i, q_values in enumerate(np.split(y_pred, len(quantiles), axis=-1)):
+            plt.plot(x_test, q_values[:, 0], linewidth=2, label=f"Q({quantiles[i]:.2f})")
 
-    plt.legend()
-    plt.show()
+        plt.legend()
+        plt.show()
+        return fig  # __st
+__st.markdown(r"""</details>""", unsafe_allow_html=True)
+with __st.echo(), streambook.st_stdout('info'):
+    fig = [  # __st
+    show_plot()
+    ][0]  # __st
     fig  # __st
-__st.markdown(r"""Amazing! Notice how the first few quantiles are tightly packed together while the last ones spread out, capturing the behavior of the exponential distribution. We can also visualize the region between the highest and lowest quantiles, and this gives us some bounds on our predictions.""", unsafe_allow_html=True)
+__st.markdown(r"""Amazing! Notice how the first few quantiles are tightly packed together while the last ones spread out, capturing the behavior of the exponential distribution. We can also visualize the region between the highest and lowest quantiles, and this gives us some bounds on our predictions.
+
+<details>
+<summary markdown="span">Show code</summary>""", unsafe_allow_html=True)
 with __st.echo(), streambook.st_stdout('info'):
     median_idx = np.where(np.isclose(quantiles, 0.5))[0]
 
-    fig = plt.figure()  # __st
-    plt.fill_between(x_test, y_pred[:, -1], y_pred[:, 0], alpha=0.5, color="b")
-    plt.scatter(x, y, s=20, facecolors="none", edgecolors="k")
-    plt.plot(
-        x_test,
-        y_pred[:, median_idx],
-        color="r",
-        linestyle="dashed",
-        label="Q(0.5)",
-    )
-    plt.legend()
-    plt.show()
+    def show_plot():
+        fig = plt.figure()  # __st
+        plt.fill_between(x_test, y_pred[:, -1], y_pred[:, 0], alpha=0.5, color="b")
+        plt.scatter(x, y, s=20, facecolors="none", edgecolors="k")
+        plt.plot(
+            x_test,
+            y_pred[:, median_idx],
+            color="r",
+            linestyle="dashed",
+            label="Q(0.5)",
+        )
+        plt.legend()
+        plt.show()
+        return fig  # __st
+__st.markdown(r"""</details>""", unsafe_allow_html=True)
+with __st.echo(), streambook.st_stdout('info'):
+    fig = [  # __st
+    show_plot()
+    ][0]  # __st
     fig  # __st
-__st.markdown(r"""On the other hand, having multiple quantile values allows us to estimate the density of the data. Since the difference between two adjacent quantiles represent the probability that a point lies between them, we can construct a piecewise function that approximates the density of the data.""", unsafe_allow_html=True)
+__st.markdown(r"""On the other hand, having multiple quantile values allows us to estimate the density of the data. Since the difference between two adjacent quantiles represent the probability that a point lies between them, we can construct a piecewise function that approximates the density of the data.
+
+<details>
+<summary markdown="span">Show code</summary>""", unsafe_allow_html=True)
 with __st.echo(), streambook.st_stdout('info'):
     def get_pdf(quantiles, q_values):
         densities = []
@@ -273,7 +318,11 @@ with __st.echo(), streambook.st_stdout('info'):
 
     def doubled(xs):
         return [np.clip(xs[i], 0, 3) for i in range(len(xs)) for _ in range(2)]
-__st.markdown(r"""For a given `x`, we can compute the quantile values and then use these to compute the conditional piecewise density function of `y` given `x`.""", unsafe_allow_html=True)
+__st.markdown(r"""</details>""", unsafe_allow_html=True)
+__st.markdown(r"""For a given `x`, we can compute the quantile values and then use these to compute the conditional piecewise density function of `y` given `x`.
+
+<details>
+<summary markdown="span">Show code</summary>""", unsafe_allow_html=True)
 with __st.echo(), streambook.st_stdout('info'):
     xi = 7.0
     xi = __st.slider("xi", 0.0001, 11.0, xi)
@@ -282,15 +331,22 @@ with __st.echo(), streambook.st_stdout('info'):
 
     densities = get_pdf(quantiles, q_values)
 
-    fig = plt.figure()  # __st
-    plt.title(f"x = {xi}")
-    plt.fill_between(piecewise(q_values), 0, doubled(densities))
-    # plt.fill_between(q_values, 0, densities + [0])
-    # plt.plot(q_values, densities + [0], color="k")
-    plt.xlim(0, y.max())
-    plt.gca().set_xlabel("y")
-    plt.gca().set_ylabel("p(y)")
-    plt.show()
+    def show_plot():
+        fig = plt.figure()  # __st
+        plt.title(f"x = {xi}")
+        plt.fill_between(piecewise(q_values), 0, doubled(densities))
+        # plt.fill_between(q_values, 0, densities + [0])
+        # plt.plot(q_values, densities + [0], color="k")
+        plt.xlim(0, y.max())
+        plt.gca().set_xlabel("y")
+        plt.gca().set_ylabel("p(y)")
+        plt.show()
+        return fig  # __st
+__st.markdown(r"""</details>""", unsafe_allow_html=True)
+with __st.echo(), streambook.st_stdout('info'):
+    fig = [  # __st
+    show_plot()
+    ][0]  # __st
     fig  # __st
 __st.markdown(r"""<span id='Recap'> </span><span id='Next Steps'> </span><span id='Acknowledgments'> </span>
 One of the exciting properties of Quantile Regression is that we did not need to know a priori the output distribution, and training is easy compared to other methods.
@@ -309,5 +365,5 @@ about the output distribution.
 * Learn more about [jax](https://github.com/google/jax) and [elegy](https://github.com/poets-ai/elegy).
 
 ## Acknowledgments
-* Many thanks to [David Cardozo](https://github.com/davidnet) for his proofreading and getting the notebook to run in colab.""", unsafe_allow_html=True)
+Many thanks to [David Cardozo](https://github.com/davidnet) for his proofreading and getting the notebook to run in colab.""", unsafe_allow_html=True)
 
