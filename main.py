@@ -55,7 +55,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 
-plt.rcParams["figure.dpi"] = int(os.environ.get("FIGURE_DPI", 100))
+plt.rcParams["figure.dpi"] = int(os.environ.get("FIGURE_DPI", 150))
 plt.rcParams["figure.facecolor"] = os.environ.get("FIGURE_FACECOLOR", "white")
 np.random.seed(69)
 
