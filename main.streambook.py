@@ -160,7 +160,7 @@ with __st.echo(), streambook.st_stdout('info'):
     plt.gca().set_xlabel("y_pred")
     plt.gca().set_ylabel("loss")
     plt.title(f"Q({q:.2f}) = {q_true:.1f}")
-    plt.show()
+    plt.close()
 __st.markdown(r"""</details>""", unsafe_allow_html=True)
 with __st.echo(), streambook.st_stdout('info'):
     fig
@@ -248,7 +248,7 @@ with __st.echo(), streambook.st_stdout('info'):
         plt.plot(x_test, q_values[:, 0], linewidth=2, label=f"Q({quantiles[i]:.2f})")
 
     plt.legend()
-    plt.show()
+    plt.close()
 __st.markdown(r"""</details>""", unsafe_allow_html=True)
 with __st.echo(), streambook.st_stdout('info'):
     fig
@@ -270,7 +270,7 @@ with __st.echo(), streambook.st_stdout('info'):
         label="Q(0.5)",
     )
     plt.legend()
-    plt.show()
+    plt.close()
 __st.markdown(r"""</details>""", unsafe_allow_html=True)
 with __st.echo(), streambook.st_stdout('info'):
     fig
@@ -319,7 +319,7 @@ with __st.echo(), streambook.st_stdout('info'):
     plt.xlim(0, y.max())
     plt.gca().set_xlabel("y")
     plt.gca().set_ylabel("p(y)")
-    plt.show()
+    plt.close()
 __st.markdown(r"""</details>""", unsafe_allow_html=True)
 with __st.echo(), streambook.st_stdout('info'):
     fig

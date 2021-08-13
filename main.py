@@ -170,7 +170,7 @@ plt.vlines(q_true, 0, loss.max(), linestyles="dashed", colors="k")
 plt.gca().set_xlabel("y_pred")
 plt.gca().set_ylabel("loss")
 plt.title(f"Q({q:.2f}) = {q_true:.1f}")
-plt.show()
+plt.close()
 
 
 # %% [markdown]
@@ -294,7 +294,7 @@ for i, q_values in enumerate(np.split(y_pred, len(quantiles), axis=-1)):
     plt.plot(x_test, q_values[:, 0], linewidth=2, label=f"Q({quantiles[i]:.2f})")
 
 plt.legend()
-plt.show()
+plt.close()
 
 # %% [markdown]
 """
@@ -323,7 +323,7 @@ plt.plot(
     label="Q(0.5)",
 )
 plt.legend()
-plt.show()
+plt.close()
 
 # %% [markdown]
 """
@@ -387,7 +387,7 @@ plt.fill_between(piecewise(q_values), 0, doubled(densities))
 plt.xlim(0, y.max())
 plt.gca().set_xlabel("y")
 plt.gca().set_ylabel("p(y)")
-plt.show()
+plt.close()
 
 # %% [markdown]
 """
