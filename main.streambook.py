@@ -47,8 +47,9 @@ of our data: the quantiles.
 with __st.echo(), streambook.st_stdout('info'):
     _ = __st
     # uncomment to install dependencies
-    # ! curl -Ls https://raw.githubusercontent.com/Davidnet/quantile-regression/master/requirements.txt > requirements.txt
+    # ! curl -Ls https://raw.githubusercontent.com/cgarciae/quantile-regression/master/requirements.txt > requirements.txt
     # ! pip install -qr requirements.txt
+    # ! pip install -U matplotlib
 __st.markdown(r"""</details>""", unsafe_allow_html=True)
 __st.markdown(r"""To begin our journey into quantile regression, we will first get a hold on some data:
 

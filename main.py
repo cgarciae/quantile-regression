@@ -35,8 +35,9 @@ of our data: the quantiles.
 # %%
 _ = __st
 # uncomment to install dependencies
-## ! curl -Ls https://raw.githubusercontent.com/Davidnet/quantile-regression/master/requirements.txt > requirements.txt
+## ! curl -Ls https://raw.githubusercontent.com/cgarciae/quantile-regression/master/requirements.txt > requirements.txt
 ## ! pip install -qr requirements.txt
+## ! pip install -U matplotlib
 
 # %% [markdown]
 """
