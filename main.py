@@ -19,15 +19,9 @@ _A simple method to estimate uncertainty in Machine Learning_
 
 
 ## Motivation
-When trying to predict and output, it is sometimes helpful to get a confidence score
-or, similarly, a range of values around this expected value in which the actual value might be found. 
-Practical examples include estimating upper and lower bound when predicting a time of arrival (ETA) or a 
-stock price since you care about an expected value and the best case and worst-case scenarios when trying to minimize risk.
+When generating predictions about an output, it is sometimes useful to get a confidence score or, similarly, a range of values around this expected value in which the actual value might be found. Practical examples include estimating an upper and lower bound when predicting an estimated time of arrival (ETA) or stock price, since you not only care about an expected value but are only interested in the best case and worst-case scenarios if you are trying to minimize risk e.g. avoid getting late or not loosing money.
 
-While most Machine Learning techniques do not provide a natural way of doing this, 
-in this article, we will be exploring **Quantile Regression** as a means of doing so; 
-and this technique will allow us to learn some critical statistical properties 
-of our data: the quantiles.
+While most Machine Learning techniques do not provide a natural way of doing this, in this article, we will be exploring **Quantile Regression** as a means of doing so. This technique will allow us to learn some critical statistical properties of our data: the quantiles.
 
 <details>
 <summary markdown="span">Install Dependencies</summary>
